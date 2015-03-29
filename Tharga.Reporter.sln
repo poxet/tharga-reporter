@@ -1,0 +1,92 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tharga.Reporter.Engine", "Tharga.Reporter.Engine\Tharga.Reporter.Engine.csproj", "{151E2FA1-4774-4F99-AB81-D571930024C5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{3D410DA1-E8E9-4430-978C-905387F880A8}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{EB79DF9A-E45A-4305-ACD2-958C16F21A29}"
+	ProjectSection(SolutionItems) = preProject
+		Build\AssemblyVersionInfo.cs = Build\AssemblyVersionInfo.cs
+		Build\build.tasks = Build\build.tasks
+		Build\CI.msbuild = Build\CI.msbuild
+		Build\Release.msbuild = Build\Release.msbuild
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tharga.Reporter.SampleConsole", "Tharga.Reporter.SampleConsole\Tharga.Reporter.SampleConsole.csproj", "{4780A238-ADA6-4481-A43E-94F3C9407B18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tharga.Reporter.Tests", "Tharga.Reporter.Tests\Tharga.Reporter.Tests.csproj", "{93EEF54E-3D63-4F74-A729-BB812986A82E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		CI|Any CPU = CI|Any CPU
+		CI|Mixed Platforms = CI|Mixed Platforms
+		CI|x86 = CI|x86
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{151E2FA1-4774-4F99-AB81-D571930024C5}.CI|Any CPU.ActiveCfg = CI|Any CPU
+		{151E2FA1-4774-4F99-AB81-D571930024C5}.CI|Any CPU.Build.0 = CI|Any CPU
+		{151E2FA1-4774-4F99-AB81-D571930024C5}.CI|Mixed Platforms.ActiveCfg = CI|Any CPU
+		{151E2FA1-4774-4F99-AB81-D571930024C5}.CI|Mixed Platforms.Build.0 = CI|Any CPU
+		{151E2FA1-4774-4F99-AB81-D571930024C5}.CI|x86.ActiveCfg = CI|Any CPU
+		{151E2FA1-4774-4F99-AB81-D571930024C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{151E2FA1-4774-4F99-AB81-D571930024C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{151E2FA1-4774-4F99-AB81-D571930024C5}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{151E2FA1-4774-4F99-AB81-D571930024C5}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{151E2FA1-4774-4F99-AB81-D571930024C5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{151E2FA1-4774-4F99-AB81-D571930024C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{151E2FA1-4774-4F99-AB81-D571930024C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{151E2FA1-4774-4F99-AB81-D571930024C5}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{151E2FA1-4774-4F99-AB81-D571930024C5}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{151E2FA1-4774-4F99-AB81-D571930024C5}.Release|x86.ActiveCfg = Release|Any CPU
+		{4780A238-ADA6-4481-A43E-94F3C9407B18}.CI|Any CPU.ActiveCfg = Release|Any CPU
+		{4780A238-ADA6-4481-A43E-94F3C9407B18}.CI|Any CPU.Build.0 = Release|Any CPU
+		{4780A238-ADA6-4481-A43E-94F3C9407B18}.CI|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4780A238-ADA6-4481-A43E-94F3C9407B18}.CI|Mixed Platforms.Build.0 = Release|Any CPU
+		{4780A238-ADA6-4481-A43E-94F3C9407B18}.CI|x86.ActiveCfg = Release|Any CPU
+		{4780A238-ADA6-4481-A43E-94F3C9407B18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4780A238-ADA6-4481-A43E-94F3C9407B18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4780A238-ADA6-4481-A43E-94F3C9407B18}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4780A238-ADA6-4481-A43E-94F3C9407B18}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4780A238-ADA6-4481-A43E-94F3C9407B18}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4780A238-ADA6-4481-A43E-94F3C9407B18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4780A238-ADA6-4481-A43E-94F3C9407B18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4780A238-ADA6-4481-A43E-94F3C9407B18}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4780A238-ADA6-4481-A43E-94F3C9407B18}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4780A238-ADA6-4481-A43E-94F3C9407B18}.Release|x86.ActiveCfg = Release|Any CPU
+		{93EEF54E-3D63-4F74-A729-BB812986A82E}.CI|Any CPU.ActiveCfg = CI|Any CPU
+		{93EEF54E-3D63-4F74-A729-BB812986A82E}.CI|Any CPU.Build.0 = CI|Any CPU
+		{93EEF54E-3D63-4F74-A729-BB812986A82E}.CI|Mixed Platforms.ActiveCfg = CI|Any CPU
+		{93EEF54E-3D63-4F74-A729-BB812986A82E}.CI|Mixed Platforms.Build.0 = CI|Any CPU
+		{93EEF54E-3D63-4F74-A729-BB812986A82E}.CI|x86.ActiveCfg = CI|Any CPU
+		{93EEF54E-3D63-4F74-A729-BB812986A82E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93EEF54E-3D63-4F74-A729-BB812986A82E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93EEF54E-3D63-4F74-A729-BB812986A82E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{93EEF54E-3D63-4F74-A729-BB812986A82E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{93EEF54E-3D63-4F74-A729-BB812986A82E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{93EEF54E-3D63-4F74-A729-BB812986A82E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93EEF54E-3D63-4F74-A729-BB812986A82E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93EEF54E-3D63-4F74-A729-BB812986A82E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{93EEF54E-3D63-4F74-A729-BB812986A82E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{93EEF54E-3D63-4F74-A729-BB812986A82E}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Tharga.Reporter.vsmdi
+	EndGlobalSection
+EndGlobal

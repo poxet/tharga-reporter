@@ -1,0 +1,594 @@
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
+using System.Linq;
+using System.Xml;
+using PdfSharp.Drawing;
+using Tharga.Reporter.Engine.Entity.Util;
+using Tharga.Reporter.Engine.Interface;
+
+namespace Tharga.Reporter.Engine.Entity.Element
+{
+    public class Table : MultiPageAreaElement
+    {
+        private readonly Font _defaultContentFont = new Font();
+        private readonly Font _defaultHeaderFont = new Font { Size = 18 };
+        private readonly UnitValue _defaultRowPadding = "2px";
+        private readonly UnitValue _defaultColumnPadding = "2px";
+
+        public enum Alignment
+        {
+            Left,
+            Right
+        }
+
+        public enum WidthMode
+        {
+            Specific,
+            Auto,
+            Spring
+        }
+
+        private readonly Dictionary<string, TableColumn> _columns = new Dictionary<string, TableColumn>();
+
+        private Font _headerFont;
+        private string _headerFontClass;
+        private Color? _headerBorderColor;
+        private Color? _headerBackgroundColor;
+
+        private Font _contentFont;
+        private string _contentFontClass;
+        private Color? _contentBorderColor;
+        private Color? _contentBackgroundColor;
+
+        private Font _groupFont;
+        private Color? _groupBorderColor;
+        private Color? _groupBackgroundColor;
+        private UnitValue? _groupSpacing;
+
+        private SkipLine _skipLine;
+
+        private UnitValue? _rowPadding;
+        private UnitValue? _columnPadding;
+
+        internal Dictionary<string, TableColumn> Columns { get { return _columns; } }
+        private List<PageRowSet> _pageRowSet;
+
+        public Font HeaderFont
+        {
+            get { return _headerFont ?? _defaultHeaderFont; }
+            set
+            {
+                if (!string.IsNullOrEmpty(_headerFontClass))
+                    throw new InvalidOperationException("Cannot set both HeaderFont and HeaderFontClass. HeaderFontClass has already been set.");
+                _headerFont = value;
+            }
+        }
+
+        internal string HeaderFontClass //TODO: Hidden because it is not yet fully implemented
+        {
+            get { return _headerFontClass ?? string.Empty; }
+            set
+            {
+                if (_headerFont != null)
+                    throw new InvalidOperationException("Cannot set both HeaderFont and HeaderFontClass. HeaderFont has already been set.");
+                _headerFontClass = value;
+            }
+        }
+
+        public Color? HeaderBorderColor { get { return _headerBorderColor; } set { _headerBorderColor = value; } }
+        public Color? HeaderBackgroundColor { get { return _headerBackgroundColor; } set { _headerBackgroundColor = value; } }
+
+        public Font ContentFont
+        {
+            get { return _contentFont ?? _defaultContentFont; }
+            set
+            {
+                if (!string.IsNullOrEmpty(_contentFontClass))
+                    throw new InvalidOperationException("Cannot set both ContentFont and ContentFontClass. ContentFontClass has already been set.");
+                _contentFont = value;
+            }
+        }
+
+        public UnitValue GroupSpacing { get { return _groupSpacing ?? new UnitValue(); } set { _groupSpacing = value; } }
+        public Font GroupFont { get { return _groupFont ?? _contentFont ?? _defaultContentFont; } set { _groupFont = value; } }
+
+        internal string ContentFontClass //TODO: Hidden because it is not yet fully implemented
+        {
+            get { return _contentFontClass ?? string.Empty; }
+            set
+            {
+                if (_contentFont != null)
+                    throw new InvalidOperationException("Cannot set both ContentFont and ContentFontClass. ContentFont has already been set.");
+                _contentFontClass = value;
+            }
+        }
+
+        public Color? ContentBorderColor { get { return _contentBorderColor; } set { _contentBorderColor = value; } }
+        public Color? ContentBackgroundColor { get { return _contentBackgroundColor; } set { _contentBackgroundColor = value; } }
+        public Color? GroupBorderColor { get { return _groupBorderColor; } set { _groupBorderColor = value; } }
+        public Color? GroupBackgroundColor { get { return _groupBackgroundColor; } set { _groupBackgroundColor = value; } }
+        public SkipLine SkipLine { get { return _skipLine; } set { _skipLine = value; } }
+        public UnitValue RowPadding { get { return _rowPadding ?? _defaultRowPadding; } set { _rowPadding = value; } }
+        public UnitValue ColumnPadding { get { return _columnPadding ?? _defaultColumnPadding; } set { _columnPadding = value; } }
+
+        internal override int PreRender(IRenderData renderData)
+        {
+            _pageRowSet = new List<PageRowSet>();
+
+            renderData.ElementBounds = GetBounds(renderData.ParentBounds);
+
+            if (IsBackground && !renderData.IncludeBackground)
+                return 0;
+
+            var headerFont = new XFont(_headerFont.GetName(renderData.Section), _headerFont.GetSize(renderData.Section), _headerFont.GetStyle(renderData.Section));
+            var lineFont = new XFont(_contentFont.GetName(renderData.Section), _contentFont.GetSize(renderData.Section), _contentFont.GetStyle(renderData.Section));
+            var groupFont = new XFont(_groupFont.GetName(renderData.Section), _groupFont.GetSize(renderData.Section), _groupFont.GetStyle(renderData.Section));
+
+            var firstColumn = _columns.FirstOrDefault();
+            if (firstColumn.Value == null)
+                return 0;
+
+            var headerSize = renderData.Graphics.MeasureString(firstColumn.Value.DisplayName, headerFont, XStringFormats.TopLeft);
+            var stdLineSize = renderData.Graphics.MeasureString(firstColumn.Value.DisplayName, lineFont, XStringFormats.TopLeft);
+
+            if (renderData.DocumentData != null)
+            {
+                var dataTable = renderData.DocumentData.GetDataTable(Name);
+                if (dataTable != null)
+                {
+                    var top = headerSize.Height + RowPadding.GetXUnitValue(renderData.ElementBounds.Height);
+                    var pageIndex = 1;
+                    var firstLineOnPage = 0;
+                    for (var i = 0; i < dataTable.Rows.Count; i++)
+                    {
+                        var lineSize = stdLineSize;
+                        if (dataTable.Rows[i] is DocumentDataTableData)
+                        {
+                            if (_skipLine != null && pageIndex % SkipLine.Interval == 0)
+                                top += SkipLine.Height.GetXUnitValue(renderData.ElementBounds.Height);
+                        }
+                        else if (dataTable.Rows[i] is DocumentDataTableGroup)
+                        {
+                            top += GroupSpacing.GetXUnitValue(renderData.ElementBounds.Height);
+                            lineSize = renderData.Graphics.MeasureString("X", groupFont, XStringFormats.TopLeft);
+                            pageIndex = 0;
+                        }
+
+                        top += lineSize.Height;
+                        top += RowPadding.GetXUnitValue(renderData.ElementBounds.Height);
+
+                        pageIndex++;
+
+                        if (top > renderData.ElementBounds.Height - lineSize.Height)
+                        {
+                            _pageRowSet.Add(new PageRowSet { FromRow = firstLineOnPage, ToRow = i });
+                            firstLineOnPage = i + 1;
+                            top = headerSize.Height + RowPadding.GetXUnitValue(renderData.ElementBounds.Height);
+                        }
+                    }
+
+                    if (firstLineOnPage != dataTable.Rows.Count)
+                        _pageRowSet.Add(new PageRowSet { FromRow = firstLineOnPage, ToRow = dataTable.Rows.Count - 1 });
+                }
+            }
+
+            return _pageRowSet.Count;
+        }
+
+        internal override void Render(IRenderData renderData, int page)
+        {
+            if (IsNotVisible(renderData))
+                return;
+
+            if (_pageRowSet == null) throw new InvalidOperationException("PreRendering has not yet been performed.");
+
+            renderData.ElementBounds = GetBounds(renderData.ParentBounds);
+
+            if (!renderData.IncludeBackground && IsBackground)
+                return;
+
+            var headerFont = new XFont(_headerFont.GetName(renderData.Section), _headerFont.GetSize(renderData.Section), _headerFont.GetStyle(renderData.Section));
+            var headerBrush = new XSolidBrush(XColor.FromArgb(_headerFont.GetColor(renderData.Section)));
+            var lineFont = new XFont(_contentFont.GetName(renderData.Section), _contentFont.GetSize(renderData.Section), _contentFont.GetStyle(renderData.Section));
+            var lineBrush = new XSolidBrush(XColor.FromArgb(_contentFont.GetColor(renderData.Section)));
+            var groupFont = new XFont(_groupFont.GetName(renderData.Section), _groupFont.GetSize(renderData.Section), _groupFont.GetStyle(renderData.Section));
+
+            var firstColumn = _columns.FirstOrDefault();
+            if (firstColumn.Value == null)
+                return;
+            var headerSize = renderData.Graphics.MeasureString(firstColumn.Value.DisplayName, headerFont, XStringFormats.TopLeft);
+            var stdLineSize = renderData.Graphics.MeasureString(firstColumn.Value.DisplayName, lineFont, XStringFormats.TopLeft);
+
+            RenderBorder(renderData.ElementBounds, renderData.Graphics, headerSize);
+
+            if (renderData.DebugData != null)
+                renderData.Graphics.DrawString(string.Format("Table: {0}", Name), renderData.DebugData.Font, renderData.DebugData.Brush, renderData.ElementBounds.Center);
+
+            if (renderData.DocumentData != null)
+            {
+                var dataTable = renderData.DocumentData.GetDataTable(Name);
+                if (dataTable != null)
+                {
+                    var columnPadding = ColumnPadding.GetXUnitValue(renderData.ElementBounds.Width);
+
+                    var springCount = _columns.Count(x => x.Value.WidthMode == WidthMode.Spring);
+
+                    //Calculate column width
+                    foreach (var column in _columns.Where(x => x.Value.WidthMode != WidthMode.Spring).ToList())
+                    {
+                        var stringSize = renderData.Graphics.MeasureString(column.Value.DisplayName, headerFont, XStringFormats.TopLeft);
+
+                        if (column.Value.Width == null)
+                            throw new NullReferenceException(string.Format("Column {0} does not have a width.", column.Value.DisplayName));
+
+                        if (stringSize.Width > column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width))
+                            column.Value.Width = UnitValue.Parse(stringSize.Width.ToString(CultureInfo.InvariantCulture));
+
+                        if (column.Value.HideValue != null)
+                            column.Value.Hide = true;
+
+                        foreach (var row in dataTable.Rows)
+                        {
+                            if (row is DocumentDataTableData)
+                            {
+                                var rowData = row as DocumentDataTableData;
+
+                                var cellData = GetValue(column.Key, rowData.Columns);
+                                stringSize = renderData.Graphics.MeasureString(cellData, lineFont, XStringFormats.TopLeft);
+                                if (stringSize.Width > column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width))
+                                    column.Value.Width = UnitValue.Parse((stringSize.Width + (columnPadding * 2)).ToString(CultureInfo.InvariantCulture) + "px");
+
+                                var parsedHideValue = GetValue(column.Value.HideValue, rowData.Columns);
+                                if (parsedHideValue != cellData)
+                                    column.Value.Hide = false;
+                            }
+                        }
+
+                        if (column.Value.Hide)
+                            column.Value.Width = new UnitValue();
+                    }
+
+                    var totalWidth = renderData.ElementBounds.Width;
+                    var nonSpringWidth = _columns.Where(x => x.Value.WidthMode != WidthMode.Spring).Sum(x => x.Value.Width.Value != null ? x.Value.Width.Value.GetXUnitValue(totalWidth) : 0);
+
+                    if (springCount > 0)
+                    {
+                        foreach (var column in _columns.Where(x => x.Value.WidthMode == WidthMode.Spring && !x.Value.Hide).ToList())
+                        {
+                            column.Value.Width = UnitValue.Parse(((renderData.ElementBounds.Width - nonSpringWidth) / springCount).ToString(CultureInfo.InvariantCulture));
+                        }
+                    }
+
+                    //Create header
+                    double left = 0;
+                    var tableColumns = _columns.Values.Where(x => !x.Hide).ToList();
+                    foreach (var column in tableColumns)
+                    {
+                        var alignmentJusttification = 0D;
+                        if (column.Align == Alignment.Right)
+                        {
+                            var stringSize = renderData.Graphics.MeasureString(column.DisplayName, headerFont, XStringFormats.TopLeft);
+                            alignmentJusttification = column.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - stringSize.Width - columnPadding;
+                        }
+                        else
+                            alignmentJusttification += columnPadding;
+
+                        renderData.Graphics.DrawString(column.DisplayName, headerFont, headerBrush, new XPoint(renderData.ElementBounds.Left + left + alignmentJusttification, renderData.ElementBounds.Top), XStringFormats.TopLeft);
+                        left += column.Width.Value.GetXUnitValue(renderData.ElementBounds.Width);
+
+                        if (renderData.DebugData != null)
+                            renderData.Graphics.DrawLine(renderData.DebugData.Pen, renderData.ElementBounds.Left + left, renderData.ElementBounds.Top, renderData.ElementBounds.Left + left, renderData.ElementBounds.Bottom);
+                    }
+
+                    var top = headerSize.Height + RowPadding.GetXUnitValue(renderData.ElementBounds.Height);
+                    var pageIndex = 1;
+
+                    var defaultRowset = true;
+                    var pageRowSet = new PageRowSet { FromRow = 1 };
+                    var index = page - renderData.Section.GetPageOffset();
+                    if (_pageRowSet.Count > index)
+                    {
+                        try
+                        {
+                            defaultRowset = false;
+                            pageRowSet = _pageRowSet[index];
+                        }
+                        catch (Exception exception)
+                        {
+                            throw new InvalidOperationException(string.Format("_pageRowSet.Count={0}, index={1}", _pageRowSet.Count, index), exception);
+                        }
+                    }
+
+                    for (var i = pageRowSet.FromRow; i < pageRowSet.ToRow + 1; i++)
+                    {
+                        DocumentDataTableLine row;
+                        try
+                        {
+                            row = dataTable.Rows[i];
+                        }
+                        catch (Exception exception)
+                        {
+                            var msg = string.Format("Looping from {0} to {1}. Currently at {2}, collection has {3} lines.", pageRowSet.FromRow, pageRowSet.ToRow + 1, i, dataTable.Rows.Count);
+                            throw new InvalidOperationException(msg + string.Format("dataTable.Rows.Count={0}, i={1}, pageIndex={2}, page={3}, GetPageOffset={4}, index={5}, FromRow={6}, ToRow={7}, _pageRowSet.Count={8}, defaultRowset={9}", dataTable.Rows.Count, i, pageIndex, page, renderData.Section.GetPageOffset(), index, pageRowSet.FromRow, pageRowSet.ToRow, _pageRowSet.Count, defaultRowset), exception);
+                        }
+
+                        left = 0;
+                        var lineSize = stdLineSize;
+                        if (row is DocumentDataTableData)
+                        {
+                            var rowData = row as DocumentDataTableData;
+
+                            foreach (var column in _columns.Where(x => !x.Value.Hide).ToList())
+                            {
+                                var cellData = GetValue(column.Key, rowData.Columns);
+
+                                var alignmentJusttification = 0D;
+                                if (column.Value.Align == Alignment.Right)
+                                {
+                                    var stringSize = renderData.Graphics.MeasureString(cellData, lineFont, XStringFormats.TopLeft);
+                                    alignmentJusttification = column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - stringSize.Width - columnPadding;
+                                }
+                                else
+                                    alignmentJusttification += columnPadding;
+
+                                var parsedHideValue = GetValue(column.Value.HideValue, rowData.Columns);
+                                if (parsedHideValue == cellData)
+                                    cellData = string.Empty;
+
+                                renderData.Graphics.DrawString(cellData, lineFont, lineBrush, new XPoint(renderData.ElementBounds.Left + left + alignmentJusttification, renderData.ElementBounds.Top + top), XStringFormats.TopLeft);
+                                left += column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width);
+                            }
+
+                            if (_skipLine != null && pageIndex % SkipLine.Interval == 0)
+                                top += SkipLine.Height.GetXUnitValue(renderData.ElementBounds.Height);
+                        }
+                        else if (row is DocumentDataTableGroup)
+                        {
+                            var group = row as DocumentDataTableGroup;
+
+                            if (pageIndex != 1)
+                                top += GroupSpacing.GetXUnitValue(renderData.ElementBounds.Height);
+
+                            var groupData = group.Content;
+                            var stringSize = renderData.Graphics.MeasureString(groupData, groupFont, XStringFormats.TopLeft);
+                            lineSize = stringSize;
+                            var topLeft = new XPoint(renderData.ElementBounds.Left + left, renderData.ElementBounds.Top + top);
+
+                            if (GroupBackgroundColor != null)
+                            {
+                                var brush = new XSolidBrush(XColor.FromArgb(GroupBackgroundColor.Value));
+                                var rect = new XRect(topLeft, new XSize(renderData.ElementBounds.Width, stringSize.Height));
+                                renderData.Graphics.DrawRectangle(new XPen(XColor.FromArgb(GroupBorderColor ?? GroupBackgroundColor.Value), 0.1), brush, rect);
+                            }
+                            else if (GroupBorderColor != null)
+                            {
+                                var rect = new XRect(topLeft, new XSize(renderData.ElementBounds.Width, stringSize.Height));
+                                renderData.Graphics.DrawRectangle(new XPen(XColor.FromArgb(GroupBorderColor.Value), 0.1), rect);
+                            }
+
+                            renderData.Graphics.DrawString(groupData, groupFont, lineBrush, topLeft, XStringFormats.TopLeft);
+                            pageIndex = 0;
+                        }
+
+                        top += lineSize.Height;
+                        top += RowPadding.GetXUnitValue(renderData.ElementBounds.Height);
+
+                        pageIndex++;
+                    }
+                }
+            }
+
+            if (renderData.DebugData != null)
+                renderData.Graphics.DrawRectangle(renderData.DebugData.Pen, renderData.ElementBounds);
+        }
+
+        private void RenderBorder(XRect elementBounds, IGraphics gfx, XSize headerSize)
+        {
+            if (ContentBorderColor != null || ContentBackgroundColor != null)
+            {
+                var borderPen = new XPen(ContentBorderColor ?? ContentBackgroundColor.Value, 0.1); //TODO: Set the thickness of the boarder
+
+                if (ContentBackgroundColor != null)
+                {
+                    var brush = new XSolidBrush(XColor.FromArgb(ContentBackgroundColor.Value));
+                    gfx.DrawRectangle(borderPen, brush, new XRect(elementBounds.Left, elementBounds.Top + headerSize.Height, elementBounds.Width, elementBounds.Height - headerSize.Height));
+                }
+                else
+                    gfx.DrawRectangle(borderPen, new XRect(elementBounds.Left, elementBounds.Top + headerSize.Height, elementBounds.Width, elementBounds.Height - headerSize.Height));
+            }
+
+            if (HeaderBorderColor != null || HeaderBackgroundColor != null)
+            {
+                var borderPen = new XPen(HeaderBorderColor ?? HeaderBackgroundColor.Value, 0.1); //TODO: Se the thickness of the boarder
+
+                if (HeaderBackgroundColor != null)
+                {
+                    var brush = new XSolidBrush(XColor.FromArgb(HeaderBackgroundColor.Value));
+                    gfx.DrawRectangle(borderPen, brush, new XRect(elementBounds.Left, elementBounds.Top, elementBounds.Width, headerSize.Height));
+                }
+                else
+                    gfx.DrawRectangle(borderPen, new XRect(elementBounds.Left, elementBounds.Top, elementBounds.Width, headerSize.Height));
+            }
+        }
+
+        private string GetValue(string input, Dictionary<string, string> row)
+        {
+            var result = input.ParseValue(row);
+            return result;
+        }
+
+        public void AddColumn(string displayFormat, string displayName, UnitValue? width = null, WidthMode widthMode = WidthMode.Auto, Alignment alignment = Alignment.Left, string hideValue = null)
+        {
+            _columns.Add(displayFormat, new TableColumn(displayName, width, widthMode, alignment, hideValue));
+        }
+
+        internal override XmlElement ToXme()
+        {
+            var xme = base.ToXme();
+
+            if (_contentBackgroundColor != null)
+                xme.SetAttribute("ContentBackgroundColor", string.Format("{0}{1}{2}", _contentBackgroundColor.Value.R.ToString("X2"), _contentBackgroundColor.Value.G.ToString("X2"), _contentBackgroundColor.Value.B.ToString("X2")));
+
+            if (_contentBorderColor != null)
+                xme.SetAttribute("ContentBorderColor", string.Format("{0}{1}{2}", _contentBorderColor.Value.R.ToString("X2"), _contentBorderColor.Value.G.ToString("X2"), _contentBorderColor.Value.B.ToString("X2")));
+
+            if (_groupBackgroundColor != null)
+                xme.SetAttribute("GroupBackgroundColor", string.Format("{0}{1}{2}", _groupBackgroundColor.Value.R.ToString("X2"), _groupBackgroundColor.Value.G.ToString("X2"), _groupBackgroundColor.Value.B.ToString("X2")));
+
+            if (_groupBorderColor != null)
+                xme.SetAttribute("GroupBorderColor", string.Format("{0}{1}{2}", _groupBorderColor.Value.R.ToString("X2"), _groupBorderColor.Value.G.ToString("X2"), _groupBorderColor.Value.B.ToString("X2")));
+
+            if (_headerBackgroundColor != null)
+                xme.SetAttribute("HeaderBackgroundColor", string.Format("{0}{1}{2}", _headerBackgroundColor.Value.R.ToString("X2"), _headerBackgroundColor.Value.G.ToString("X2"), _headerBackgroundColor.Value.B.ToString("X2")));
+
+            if (_headerBorderColor != null)
+                xme.SetAttribute("HeaderBorderColor", string.Format("{0}{1}{2}", _headerBorderColor.Value.R.ToString("X2"), _headerBorderColor.Value.G.ToString("X2"), _headerBorderColor.Value.B.ToString("X2")));
+
+            if (_headerFont != null)
+            {
+                var fontXme = _headerFont.ToXme("HeaderFont");
+                if (xme.OwnerDocument == null) throw new NullReferenceException("There is no OwnerDocument for xme.");
+                var importedFont = xme.OwnerDocument.ImportNode(fontXme, true);
+                xme.AppendChild(importedFont);
+            }
+
+            if (_headerFontClass != null)
+                xme.SetAttribute("HeaderFontClass", _headerFontClass);
+
+            if (_contentFont != null)
+            {
+                var fontXme = _contentFont.ToXme("ContentFont");
+                if (xme.OwnerDocument == null) throw new NullReferenceException("There is no OwnerDocument for xme.");
+                var importedFont = xme.OwnerDocument.ImportNode(fontXme, true);
+                xme.AppendChild(importedFont);
+            }
+
+            if (_contentFontClass != null)
+                xme.SetAttribute("ContentFontClass", _contentFontClass);
+
+            if (_groupFont != null)
+            {
+                var fontXme = _groupFont.ToXme("GroupFont");
+                if (xme.OwnerDocument == null) throw new NullReferenceException("There is no OwnerDocument for xme.");
+                var importedFont = xme.OwnerDocument.ImportNode(fontXme, true);
+                xme.AppendChild(importedFont);
+            }
+
+            if (_skipLine != null)
+            {
+                var xmeSkipLine = _skipLine.ToXme();
+                if (xme.OwnerDocument == null) throw new NullReferenceException("There is no OwnerDocument for xme.");
+                var importeSkipLine = xme.OwnerDocument.ImportNode(xmeSkipLine, true);
+                xme.AppendChild(importeSkipLine);
+            }
+
+            if (_rowPadding != null)
+                xme.SetAttribute("RowPadding", _rowPadding.Value.ToString());
+
+            if (_columnPadding != null)
+                xme.SetAttribute("ColumnPadding", _columnPadding.Value.ToString());
+
+            if (_groupSpacing != null)
+                xme.SetAttribute("GroupSpacing", _groupSpacing.Value.ToString());
+
+            var columns = xme.OwnerDocument.CreateElement("Columns");
+            xme.AppendChild(columns);
+            foreach (var column in Columns)
+            {
+                var xmeColumn = column.Value.ToXme();
+
+                xmeColumn.SetAttribute("Key", column.Key);
+
+                var col = columns.OwnerDocument.ImportNode(xmeColumn, true);
+                columns.AppendChild(col);
+            }
+
+            return xme;
+        }
+
+        internal static Table Load(XmlElement xme)
+        {
+            var table = new Table();
+
+            table.AppendData(xme);
+
+            var xmlBackgroundColor = xme.Attributes["ContentBackgroundColor"];
+            if (xmlBackgroundColor != null)
+                table.ContentBackgroundColor = xmlBackgroundColor.Value.ToColor();
+
+            var xmlBorderColor = xme.Attributes["ContentBorderColor"];
+            if (xmlBorderColor != null)
+                table.ContentBorderColor = xmlBorderColor.Value.ToColor();
+
+            var xmlGroupBackgroundColor = xme.Attributes["GroupBackgroundColor"];
+            if (xmlGroupBackgroundColor != null)
+                table.GroupBackgroundColor = xmlGroupBackgroundColor.Value.ToColor();
+
+            var xmlGroupBorderColor = xme.Attributes["GroupBorderColor"];
+            if (xmlGroupBorderColor != null)
+                table.GroupBorderColor = xmlGroupBorderColor.Value.ToColor();
+
+            var xmlHeaderBackgroundColor = xme.Attributes["HeaderBackgroundColor"];
+            if (xmlHeaderBackgroundColor != null)
+                table.HeaderBackgroundColor = xmlHeaderBackgroundColor.Value.ToColor();
+
+            var xmlHeaderBorderColor = xme.Attributes["HeaderBorderColor"];
+            if (xmlHeaderBorderColor != null)
+                table.HeaderBorderColor = xmlHeaderBorderColor.Value.ToColor();
+
+            var xmlHeaderFontClass = xme.Attributes["HeaderFontClass"];
+            if (xmlHeaderFontClass != null)
+                table.HeaderFontClass = xmlHeaderFontClass.Value;
+
+            var xmlLineFontClass = xme.Attributes["ContentFontClass"];
+            if (xmlLineFontClass != null)
+                table.ContentFontClass = xmlLineFontClass.Value;
+
+            var xmlRowPadding = xme.Attributes["RowPadding"];
+            if (xmlRowPadding != null)
+                table.RowPadding = xmlRowPadding.Value;
+
+            var xmlColumnPadding = xme.Attributes["ColumnPadding"];
+            if (xmlColumnPadding != null)
+                table.ColumnPadding = xmlColumnPadding.Value;
+
+            var xmlGroupSpacing = xme.Attributes["GroupSpacing"];
+            if (xmlGroupSpacing != null)
+                table.GroupSpacing = xmlGroupSpacing.Value;
+
+            foreach (XmlElement child in xme)
+            {
+                switch (child.Name)
+                {
+                    case "HeaderFont":
+                        table.HeaderFont = Font.Load(child);
+                        break;
+                    case "ContentFont":
+                        table.ContentFont = Font.Load(child);
+                        break;
+                    case "GroupFont":
+                        table.GroupFont = Font.Load(child);
+                        break;
+                    case "SkipLine":
+                        table.SkipLine = SkipLine.Load(child);
+                        break;
+                    case "Columns":
+                        foreach (XmlElement xmlColumn in child.ChildNodes)
+                        {
+                            var name = xmlColumn.Attributes["Key"].Value;
+                            var col = TableColumn.Load(xmlColumn);
+                            table.AddColumn(name, col.DisplayName, col.Width, col.WidthMode, col.Align, col.HideValue);
+                        }
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(string.Format("Unknown subelement {0} to text base.", child.Name));
+                }
+            }
+
+            return table;
+        }
+    }
+}
