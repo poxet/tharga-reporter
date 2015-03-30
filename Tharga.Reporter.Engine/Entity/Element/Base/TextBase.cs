@@ -14,7 +14,8 @@ namespace Tharga.Reporter.Engine.Entity.Element
         public enum Alignment
         {
             Left,
-            Right
+            Right,
+            Center
         }
 
         private Font _font;
@@ -62,9 +63,19 @@ namespace Tharga.Reporter.Engine.Entity.Element
                 textSize = renderData.Graphics.MeasureString(text + ".", font, XStringFormats.TopLeft);
 
             var offset = 0D;
-            if (TextAlignment == Alignment.Right)
+            switch (TextAlignment)
             {
-                offset = bounds.Width - textSize.Width;
+                case Alignment.Right:
+                    offset = bounds.Width - textSize.Width;
+                    break;
+                case Alignment.Left:
+                    offset = 0D;
+                    break;
+                case Alignment.Center:
+                    offset = (bounds.Width / 2) - (textSize.Width / 2);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(string.Format("Unknown TextAlignment {0}.", TextAlignment));
             }
 
             renderData.ElementBounds = new XRect(bounds.Left + offset, bounds.Y, textSize.Width, textSize.Height);

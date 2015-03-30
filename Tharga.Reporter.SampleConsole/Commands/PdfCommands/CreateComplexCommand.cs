@@ -55,7 +55,9 @@ namespace Tharga.Reporter.SampleConsole.Commands.PdfCommands
 
             var mainSection = new Section { Name = "Main", Margin = new UnitRectangle { Left = "2cm", Right = "1cm", Top = "3cm", Bottom = "3cm" } };
             mainSection.Header.ElementList.Add(new Text { Value = "{Title}" });
-            mainSection.Footer.ElementList.Add(new Text { Value = "Page {PageNumber} of {TotalPages}" });
+            mainSection.Footer.ElementList.Add(new Text { Value = "Page {PageNumber} of {TotalPages}", TextAlignment = TextBase.Alignment.Left });
+            mainSection.Footer.ElementList.Add(new Text { Value = "Page {PageNumber} of {TotalPages}", TextAlignment = TextBase.Alignment.Center });
+            mainSection.Footer.ElementList.Add(new Text { Value = "Page {PageNumber} of {TotalPages}", TextAlignment = TextBase.Alignment.Right });
             template.SectionList.Add(mainSection);
             return template;
         }
