@@ -1,4 +1,3 @@
-using System.Drawing;
 using System.Threading.Tasks;
 using Tharga.Reporter.Engine.Entity;
 using Tharga.Reporter.Engine.Entity.Element;
