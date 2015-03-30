@@ -166,7 +166,7 @@ namespace Tharga.Reporter.Engine
             //or, if template or document data changed between render and pre-render then things will be messed up.
             if (!_preRendered)
             {
-                var hasMultiPageElements = _template.SectionList.Any(x => x.Pane.ElementList.Any(y => y is MultiPageAreaElement || y is MultiPageElement));
+                var hasMultiPageElements = _template.SectionList.Any(x => x.Pane.ElementList.Any(y => y is MultiPageAreaElement || y is MultiPageElement) || x.Header.ElementList.Any(y => y is MultiPageAreaElement || y is MultiPageElement) || x.Footer.ElementList.Any(y => y is MultiPageAreaElement || y is MultiPageElement));
                 if (hasMultiPageElements)
                 {
                     var pdfDocument = CreatePdfDocument();
@@ -250,7 +250,10 @@ namespace Tharga.Reporter.Engine
 
             if (preRender)
             {
-                var pageCount = section.Pane.PreRender(renderData);
+                var pageCountPane = section.Pane.PreRender(renderData);
+                var pageCountFooter = section.Footer.PreRender(renderData);
+                var pageCountHeader = section.Header.PreRender(renderData);
+                var pageCount = Max(pageCountPane, pageCountFooter, pageCountHeader);
                 section.SetRenderPageCount(pageCount);
             }
             else
@@ -294,6 +297,11 @@ namespace Tharga.Reporter.Engine
             {
                 action();
             }
+        }
+
+        private int Max(params int[] items)
+        {
+            return items.Max();
         }
 
         private Section GetSection(bool preRender, int page)
