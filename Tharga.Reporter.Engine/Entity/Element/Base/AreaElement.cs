@@ -26,11 +26,35 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
             if (height < 0)
             {
-                System.Diagnostics.Debug.WriteLine("Height is adjusted from {0} to 0.", height);
-                height = 0;
+                top = top + height;
+                height = height * -1;
+            }
+
+            if (width < 0)
+            {
+                left = left + width;
+                width = width * -1;
             }
 
             return new XRect(left, top, width, height);
+        }
+
+        protected override bool VerticalSwap(XRect parentBounds)
+        {
+            if (_relativeAlignment == null) throw new InvalidOperationException("No relative alignment for the Area.");
+            var relativeAlignment = _relativeAlignment;
+
+            var height = relativeAlignment.GetHeight(parentBounds.Height);
+            return height < 0;
+        }
+
+        protected override bool HorixontalSwap(XRect parentBounds)
+        {
+            if (_relativeAlignment == null) throw new InvalidOperationException("No relative alignment for the Area.");
+            var relativeAlignment = _relativeAlignment;
+
+            var width = relativeAlignment.GetWidht(parentBounds.Width);
+            return width < 0;
         }
 
         public override UnitValue? Top

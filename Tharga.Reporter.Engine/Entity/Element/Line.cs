@@ -1,3 +1,4 @@
+using System;
 using System.Drawing;
 using System.Xml;
 using PdfSharp.Drawing;
@@ -36,7 +37,12 @@ namespace Tharga.Reporter.Engine.Entity.Element
                 var borderWidth = UnitValue.Parse(Thickness);
                 var pen = new XPen(XColor.FromArgb(Color), borderWidth.GetXUnitValue(0));
 
-                renderData.Graphics.DrawLine(pen, renderData.ElementBounds.Left, renderData.ElementBounds.Top, renderData.ElementBounds.Right, renderData.ElementBounds.Bottom);
+                if (HorixontalSwap(renderData.ParentBounds))
+                    renderData.Graphics.DrawLine(pen, renderData.ElementBounds.Right, renderData.ElementBounds.Top, renderData.ElementBounds.Left, renderData.ElementBounds.Bottom);
+                else if (VerticalSwap(renderData.ParentBounds))
+                    renderData.Graphics.DrawLine(pen, renderData.ElementBounds.Left, renderData.ElementBounds.Bottom, renderData.ElementBounds.Right, renderData.ElementBounds.Top);
+                else
+                    renderData.Graphics.DrawLine(pen, renderData.ElementBounds.Left, renderData.ElementBounds.Top, renderData.ElementBounds.Right, renderData.ElementBounds.Bottom);
             }
         }
 

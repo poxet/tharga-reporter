@@ -160,6 +160,16 @@ namespace Tharga.Reporter.Engine.Entity
             return new XRect(left, top, width, height);
         }
 
+        protected override bool HorixontalSwap(XRect parentBounds)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override bool VerticalSwap(XRect parentBounds)
+        {
+            throw new NotImplementedException();
+        }
+
         internal override XmlElement ToXme()
         {
             var xme = base.ToXme();
