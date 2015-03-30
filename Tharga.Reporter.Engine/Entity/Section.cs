@@ -11,15 +11,41 @@ namespace Tharga.Reporter.Engine.Entity
         private UnitRectangle _margin;
         private string _name;
         private Font _defaultFont;
-        private int? _renderPageCount = null;
-        private int? _pageOffset = null;
+        private int? _renderPageCount;
+        private int? _pageOffset;
+        private Header _header;
+        private Footer _footer;
 
         public UnitRectangle Margin { get { return _margin ?? Margins.Create(UnitValue.Parse("0"), UnitValue.Parse("0"), UnitValue.Parse("0"), UnitValue.Parse("0")); } set { _margin = value; } }
-        public Header Header { get; private set; }
-        public Footer Footer { get; private set; }
         public Pane Pane { get; private set; }
         public string Name { get { return _name ?? string.Empty; } set { _name = value; } }
         public Font DefaultFont { get { return _defaultFont ?? _globalDefaultFont; } set { _defaultFont = value; } }
+
+        public Header Header
+        {
+            get
+            {
+                return _header;
+            }
+            set
+            {
+                if (value == null) throw new NullReferenceException("Cannot assign an empty header to a section.");
+                _header = value;
+            }
+        }
+
+        public Footer Footer
+        {
+            get
+            {
+                return _footer;
+            }
+            set
+            {
+                if (value == null) throw new NullReferenceException("Cannot assign an empty footer to a section.");
+                _footer = value;
+            }
+        }
 
         public Section()
         {

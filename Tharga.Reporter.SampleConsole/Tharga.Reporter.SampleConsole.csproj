@@ -50,6 +50,7 @@
     <Compile Include="Commands\PdfCommands\CreateBlankCommand.cs" />
     <Compile Include="Commands\PdfCommands\CreateComplexCommand.cs" />
     <Compile Include="Commands\PdfCommands\CreateFooterCommand.cs" />
+    <Compile Include="Commands\PdfCommands\CreateMutiSection.cs" />
     <Compile Include="Commands\PdfCommands\PdfCommand.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
