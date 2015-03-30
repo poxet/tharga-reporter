@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using PdfSharp.Drawing;
@@ -59,7 +60,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
             var left = renderData.ElementBounds.Left;
             var top = renderData.ElementBounds.Top;
 
-            if (textSize.Width > renderData.ElementBounds.Width)
+            if (textSize.Width > renderData.ElementBounds.Width || text.Contains(Environment.NewLine))
             {
                 //Need to set data over more than one page
                 var words = text.Split(' ');
@@ -68,35 +69,47 @@ namespace Tharga.Reporter.Engine.Entity.Element
                 var lines = new List<string>();
                 foreach (var nextWord in words)
                 {
-                    var textSoFar = sb.ToString();
-                    sb.AppendFormat("{0} ", nextWord);
-                    var nextTextSize = renderData.Graphics.MeasureString(sb.ToString(), font, XStringFormats.TopLeft);
-
-                    //Now we are over the limit (Previous state will fit)
-                    if (nextTextSize.Width > renderData.ElementBounds.Width)
+                    var nws = new[] { nextWord };
+                    if (nextWord.Contains(Environment.NewLine))
                     {
-                        if (string.IsNullOrEmpty(textSoFar))
-                        {
-                            //One singe word that is too long, print it anyway
-                            //renderData.Gfx.DrawString(sb.ToString(), font, brush, left, top, XStringFormats.TopLeft);
-                            lines.Add(sb.ToString());
-                        }
-                        else
-                        {
-                            //renderData.Gfx.DrawString(ready, font, brush, left, top, XStringFormats.TopLeft);
-                            lines.Add(textSoFar);
-                            sb.Clear();
-                            sb.AppendFormat("{0} ", nextWord);
-                        }
+                        nws = nextWord.Split(Environment.NewLine.ToArray());
+                        nws = nws.Select(x => x == string.Empty ? Environment.NewLine : x).ToArray();
+                    }
 
-                        top += nextTextSize.Height;
+                    foreach (var nw in nws)
+                    {
+                        var textSoFar = sb.ToString();
+                        if (nw != Environment.NewLine)
+                            sb.AppendFormat("{0} ", nw);
+                        var nextTextSize = renderData.Graphics.MeasureString(sb.ToString(), font, XStringFormats.TopLeft);
 
-                        if (top > renderData.ElementBounds.Bottom - nextTextSize.Height)
+                        //Now we are over the limit (Previous state will fit)
+                        if (nextTextSize.Width > renderData.ElementBounds.Width || nw == Environment.NewLine)
                         {
-                            //Now we have reached the limit of the page
-                            _pageText.Add(lines.ToArray());
-                            lines.Clear();
-                            top = renderData.ElementBounds.Top;
+                            if (string.IsNullOrEmpty(textSoFar))
+                            {
+                                //One singe word that is too long, print it anyway
+                                //renderData.Gfx.DrawString(sb.ToString(), font, brush, left, top, XStringFormats.TopLeft);
+                                lines.Add(sb.ToString());
+                            }
+                            else
+                            {
+                                //renderData.Gfx.DrawString(ready, font, brush, left, top, XStringFormats.TopLeft);
+                                lines.Add(textSoFar);
+                                sb.Clear();
+                                if (nw != Environment.NewLine)
+                                    sb.AppendFormat("{0} ", nw);
+                            }
+
+                            top += nextTextSize.Height;
+
+                            if (top > renderData.ElementBounds.Bottom - nextTextSize.Height)
+                            {
+                                //Now we have reached the limit of the page
+                                _pageText.Add(lines.ToArray());
+                                lines.Clear();
+                                top = renderData.ElementBounds.Top;
+                            }
                         }
                     }
                 }
