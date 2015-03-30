@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using MigraDoc.DocumentObjectModel;
 using Tharga.Reporter.Engine.Entity;
 using Tharga.Reporter.Engine.Entity.Util;
 using Tharga.Reporter.Engine.Interface;
@@ -79,7 +81,7 @@ namespace Tharga.Reporter.Engine
             return parsedValue.TrimEnd(' ');
         }
 
-        public static string ParseValue(this string value, IDocumentData documentData, PageNumberInfo pageNumberInfo, bool returnErrorMessage = true)
+        public static string ParseValue(this string value, IDocumentData documentData, PageNumberInfo pageNumberInfo, DocumentProperties documentProperties, bool returnErrorMessage = true)
         {
             if (string.IsNullOrEmpty(value))
                 return value;
@@ -97,6 +99,25 @@ namespace Tharga.Reporter.Engine
                 string dataValue = null;
                 if (pageNumberInfo != null)
                     dataValue = pageNumberInfo.GetPageNumberInfo(dataName);
+
+                switch (dataName)
+                {
+                    case "Author":
+                        dataValue = documentProperties.Author;
+                        break;
+
+                    case "Subject":
+                        dataValue = documentProperties.Subject;
+                        break;
+                    
+                    case "Title":
+                        dataValue = documentProperties.Title;
+                        break;
+
+                    case "Creator":
+                        dataValue = documentProperties.Creator;
+                        break;
+                }
 
                 if (dataValue == null)
                     dataValue = (documentData != null && documentData.Get(dataName) != null) ? documentData.Get(dataName) : (returnErrorMessage ? string.Format("[Data '{0}' is missing]", dataName) : string.Empty);

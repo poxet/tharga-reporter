@@ -15,5 +15,6 @@ namespace Tharga.Reporter.Engine.Interface
         IDocumentData DocumentData { get; }
         PageNumberInfo PageNumberInfo { get; }
         IDebugData DebugData { get; }
+        DocumentProperties DocumentProperties { get; }
     }
 }

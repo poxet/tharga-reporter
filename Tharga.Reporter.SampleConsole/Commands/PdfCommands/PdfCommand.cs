@@ -12,6 +12,7 @@ namespace Tharga.Reporter.SampleConsole.Commands.PdfCommands
             : base("pdf")
         {
             RegisterCommand(new CreateBlankCommand());
+            RegisterCommand(new CreateFooterCommand());
             RegisterCommand(new CreateComplexCommand());
         }
 

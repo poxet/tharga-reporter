@@ -51,7 +51,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
         private string GetCode(IDocumentData documentData, PageNumberInfo pageNumberInfo)
         {
-            return Code.ParseValue(documentData, pageNumberInfo);
+            return Code.ParseValue(documentData, pageNumberInfo, null);
         }
 
         internal override XmlElement ToXme()

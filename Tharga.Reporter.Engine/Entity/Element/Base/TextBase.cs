@@ -57,7 +57,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
             var font = new XFont(_font.GetName(renderData.Section), _font.GetSize(renderData.Section), _font.GetStyle(renderData.Section));
             var brush = new XSolidBrush(XColor.FromArgb(_font.GetColor(renderData.Section)));
 
-            var text = GetValue(renderData.DocumentData, renderData.PageNumberInfo);
+            var text = GetValue(renderData.DocumentData, renderData.PageNumberInfo, renderData.DocumentProperties);
             var textSize = renderData.Graphics.MeasureString(text, font, XStringFormats.TopLeft);
             if (text.EndsWith(Environment.NewLine))
                 textSize = renderData.Graphics.MeasureString(text + ".", font, XStringFormats.TopLeft);
@@ -102,16 +102,16 @@ namespace Tharga.Reporter.Engine.Entity.Element
                 {
                     renderData.Graphics.DrawRectangle(renderData.DebugData.Pen, new XRect(renderData.ElementBounds.Left, renderData.ElementBounds.Top, textSize.Width, textSize.Height));
 
-                    const int radius = 5;
-                    var l = renderData.ElementBounds.Left + adjustment;
-                    renderData.Graphics.DrawEllipse(renderData.DebugData.Pen, l - radius, renderData.ElementBounds.Top - radius, radius * 2, radius * 2);
-                    renderData.Graphics.DrawLine(renderData.DebugData.Pen, l - radius - 2, bounds.Top, l + radius + 2, bounds.Top);
-                    renderData.Graphics.DrawLine(renderData.DebugData.Pen, l, bounds.Top - radius - 2, l, bounds.Top + radius + 2);
+                    //const int radius = 5;
+                    //var l = renderData.ElementBounds.Left + adjustment;
+                    //renderData.Graphics.DrawEllipse(renderData.DebugData.Pen, l - radius, renderData.ElementBounds.Top - radius, radius * 2, radius * 2);
+                    //renderData.Graphics.DrawLine(renderData.DebugData.Pen, l - radius - 2, bounds.Top, l + radius + 2, bounds.Top);
+                    //renderData.Graphics.DrawLine(renderData.DebugData.Pen, l, bounds.Top - radius - 2, l, bounds.Top + radius + 2);
                 }
             }
         }
 
-        protected abstract string GetValue(IDocumentData documentData, PageNumberInfo pageNumberInfo);
+        protected abstract string GetValue(IDocumentData documentData, PageNumberInfo pageNumberInfo, DocumentProperties documentProperties);
 
         protected override void AppendData(XmlElement xme)
         {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using PdfSharp.Drawing;
-using Tharga.Reporter.Engine.Entity.Area;
 using Tharga.Reporter.Engine.Entity.Util;
 using Tharga.Reporter.Engine.Interface;
 
@@ -54,7 +53,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
             var font = new XFont(_font.GetName(renderData.Section), _font.GetSize(renderData.Section), _font.GetStyle(renderData.Section));
             var brush = new XSolidBrush(XColor.FromArgb(_font.GetColor(renderData.Section)));
 
-            var text = GetValue(renderData.DocumentData, renderData.PageNumberInfo);
+            var text = GetValue(renderData.DocumentData, renderData.PageNumberInfo, renderData.DocumentProperties);
             var textSize = renderData.Graphics.MeasureString(text, font, XStringFormats.TopLeft);
 
             var left = renderData.ElementBounds.Left;
@@ -128,7 +127,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
             var font = new XFont(_font.GetName(renderData.Section), _font.GetSize(renderData.Section), _font.GetStyle(renderData.Section));
             var brush = new XSolidBrush(XColor.FromArgb(_font.GetColor(renderData.Section)));
 
-            var text = GetValue(renderData.DocumentData, renderData.PageNumberInfo);
+            var text = GetValue(renderData.DocumentData, renderData.PageNumberInfo, renderData.DocumentProperties);
             var textSize = renderData.Graphics.MeasureString(text, font, XStringFormats.TopLeft);
 
             var left = renderData.ElementBounds.Left;
@@ -145,7 +144,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
             }
         }
 
-        private string GetValue(IDocumentData documentData, PageNumberInfo pageNumberInfo)
+        private string GetValue(IDocumentData documentData, PageNumberInfo pageNumberInfo, DocumentProperties documentProperties)
         {
             if (!string.IsNullOrEmpty(HideValue))
             {
@@ -154,7 +153,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
                     return string.Empty;
             }
 
-            return Value.ParseValue(documentData, pageNumberInfo);
+            return Value.ParseValue(documentData, pageNumberInfo, documentProperties);
         }
 
         internal override XmlElement ToXme()

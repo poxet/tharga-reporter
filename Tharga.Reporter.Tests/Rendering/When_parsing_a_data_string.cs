@@ -26,7 +26,7 @@ namespace Tharga.Reporter.Tests.Rendering
 
         protected override void Act()
         {
-            _result = _input.ParseValue(_documentData, null);
+            _result = _input.ParseValue(_documentData, null, null);
         }
 
         [Test]

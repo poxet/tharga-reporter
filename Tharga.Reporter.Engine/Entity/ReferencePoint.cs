@@ -38,7 +38,7 @@ namespace Tharga.Reporter.Engine.Entity
 
             var bounds = GetBounds(renderData.ParentBounds);
 
-            var rd = new RenderData(renderData.Graphics, bounds, renderData.Section, renderData.DocumentData, renderData.PageNumberInfo, renderData.DebugData, renderData.IncludeBackground);
+            var rd = new RenderData(renderData.Graphics, bounds, renderData.Section, renderData.DocumentData, renderData.PageNumberInfo, renderData.DebugData, renderData.IncludeBackground, renderData.DocumentProperties);
             var pageCount = PreRenderChildren(rd);
 
             renderData.ElementBounds = new XRect(bounds.Left, bounds.Right, 0, 0);
@@ -57,7 +57,7 @@ namespace Tharga.Reporter.Engine.Entity
 
             var bounds = GetBounds(renderData.ParentBounds);
 
-            var rd = new RenderData(renderData.Graphics, bounds, renderData.Section, renderData.DocumentData, renderData.PageNumberInfo, renderData.DebugData, renderData.IncludeBackground);
+            var rd = new RenderData(renderData.Graphics, bounds, renderData.Section, renderData.DocumentData, renderData.PageNumberInfo, renderData.DebugData, renderData.IncludeBackground, renderData.DocumentProperties);
             RenderChildren(rd, page);
 
             if (renderData.DebugData != null)

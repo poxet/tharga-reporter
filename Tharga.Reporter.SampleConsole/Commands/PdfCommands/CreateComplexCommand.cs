@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using System.Threading.Tasks;
 using Tharga.Reporter.Engine.Entity;
 using Tharga.Reporter.Engine.Entity.Element;
 using Tharga.Toolkit.Console.Command.Base;
+using Font = Tharga.Reporter.Engine.Entity.Font;
+using Rectangle = Tharga.Reporter.Engine.Entity.Element.Rectangle;
 
 namespace Tharga.Reporter.SampleConsole.Commands.PdfCommands
 {
@@ -54,7 +57,23 @@ namespace Tharga.Reporter.SampleConsole.Commands.PdfCommands
             template.SectionList.Add(indexSection);
 
             var mainSection = new Section { Name = "Main", Margin = new UnitRectangle { Left = "2cm", Right = "1cm", Top = "3cm", Bottom = "3cm" } };
-            mainSection.Header.ElementList.Add(new Text { Value = "{Title}" });
+            //mainSection.Header.ElementList.Add(new Line { Width = "100%", Height = "100%" });
+            mainSection.Header.ElementList.Add(new Text { Value = "{Title}", Left = "2cm" });
+            mainSection.Header.ElementList.Add(new Text { Value = "{Author}" });
+            mainSection.Header.ElementList.Add(new Text { Value = "{Creator}" });
+            mainSection.Header.ElementList.Add(new Text { Value = "{Subject}" });
+
+            //mainSection.Pane.ElementList.Add(new Line { Width = "100%", Height = "100%" });
+            var referencePoint = new ReferencePoint { Top = "1cm", Left = "1cm", Stack = ReferencePoint.StackMethod.Vertical };
+            referencePoint.ElementList.Add(new Text { Value = "{Title}" });
+            referencePoint.ElementList.Add(new Text { Value = "{Author}" });
+            referencePoint.ElementList.Add(new Text { Value = "{Creator}" });
+            referencePoint.ElementList.Add(new Text { Value = "{Subject}" });
+            mainSection.Pane.ElementList.Add(referencePoint);
+
+            mainSection.Footer.ElementList.Add(new Rectangle { Width = "100%", Height = "100%", BackgroundColor = Color.Red });
+            mainSection.Footer.ElementList.Add(new Rectangle { Left = "0", Top = "0", Width = "2cm", Height = "2cm", BackgroundColor = Color.Yellow });
+            mainSection.Footer.ElementList.Add(new Line { Width = "3cm", Height = "3cm" });
             mainSection.Footer.ElementList.Add(new Text { Value = "Page {PageNumber} of {TotalPages}", TextAlignment = TextBase.Alignment.Left });
             mainSection.Footer.ElementList.Add(new Text { Value = "Page {PageNumber} of {TotalPages}", TextAlignment = TextBase.Alignment.Center });
             mainSection.Footer.ElementList.Add(new Text { Value = "Page {PageNumber} of {TotalPages}", TextAlignment = TextBase.Alignment.Right });

@@ -69,7 +69,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
         private System.Drawing.Image GetImage(IDocumentData documentData, XRect bounds)
         {
-            var source = Source.ParseValue(documentData, null, false);
+            var source = Source.ParseValue(documentData, null, null, false);
 
             System.Drawing.Image imageData;
             if (File.Exists(source))

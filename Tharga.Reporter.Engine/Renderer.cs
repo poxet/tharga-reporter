@@ -246,7 +246,7 @@ namespace Tharga.Reporter.Engine
             var footerHeight = section.Footer.Height.GetXUnitValue(sectionBounds.Height);
             var paneBounds = new XRect(sectionBounds.Left, sectionBounds.Top + headerHeight, sectionBounds.Width, sectionBounds.Height - headerHeight - footerHeight);
 
-            var renderData = new RenderData(gfx, paneBounds, section, _documentData, pageNumberInfo, _debugData, _includeBackgroundObjects);
+            var renderData = new RenderData(gfx, paneBounds, section, _documentData, pageNumberInfo, _debugData, _includeBackgroundObjects, _documentProperties);
 
             if (preRender)
             {
@@ -261,7 +261,7 @@ namespace Tharga.Reporter.Engine
                 if (section.Header != null)
                 {
                     var bounds = new XRect(sectionBounds.Left, sectionBounds.Top, sectionBounds.Width, headerHeight);
-                    var renderDataHeader = new RenderData(gfx, bounds, section, _documentData, pageNumberInfo, _debugData, _includeBackgroundObjects);
+                    var renderDataHeader = new RenderData(gfx, bounds, section, _documentData, pageNumberInfo, _debugData, _includeBackgroundObjects, _documentProperties);
                     postRendering.Add(() => section.Header.Render(renderDataHeader, page));
 
                     if (_debugData != null)
@@ -274,7 +274,7 @@ namespace Tharga.Reporter.Engine
                 if (section.Footer != null)
                 {
                     var bounds = new XRect(sectionBounds.Left, sectionBounds.Bottom - footerHeight, sectionBounds.Width, footerHeight);
-                    var renderDataFooter = new RenderData(gfx, bounds, section, _documentData, pageNumberInfo, _debugData, _includeBackgroundObjects);
+                    var renderDataFooter = new RenderData(gfx, bounds, section, _documentData, pageNumberInfo, _debugData, _includeBackgroundObjects, _documentProperties);
                     postRendering.Add(() => section.Footer.Render(renderDataFooter, page));
 
                     if (_debugData != null)
