@@ -46,7 +46,7 @@ namespace Tharga.Reporter.SampleConsole.Commands.PdfCommands
         private Template CreateTemplate()
         {
             var firstPageSection = new Section { Name = "First Page" };
-            firstPageSection.Pane.ElementList.Add(new TextBox { Top = "50%", Left = "1cm", Value = "Firs page of complex sample document", Font = new Font { Size = 22 } });
+            firstPageSection.Pane.ElementList.Add(new Text { Top = "50%", Left = "1cm", Value = "Firs page of complex sample document", Font = new Font { Size = 22 }, TextAlignment = TextBase.Alignment.Center });
             var template = new Template(firstPageSection);
 
             var indexSection = new Section { Name = "Index", Margin = new UnitRectangle { Left = "2cm", Right = "1cm", Top = "3cm", Bottom = "3cm" } };

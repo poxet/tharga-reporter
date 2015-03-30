@@ -63,16 +63,20 @@ namespace Tharga.Reporter.Engine.Entity.Element
                 textSize = renderData.Graphics.MeasureString(text + ".", font, XStringFormats.TopLeft);
 
             var offset = 0D;
+            var adjustment = 0D;
             switch (TextAlignment)
             {
                 case Alignment.Right:
-                    offset = bounds.Width - textSize.Width;
+                    adjustment = textSize.Width;
+                    offset = bounds.Width - adjustment;
                     break;
                 case Alignment.Left:
+                    adjustment = 0D;
                     offset = 0D;
                     break;
                 case Alignment.Center:
-                    offset = (bounds.Width / 2) - (textSize.Width / 2);
+                    adjustment = textSize.Width / 2;
+                    offset = (bounds.Width / 2) - adjustment;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(string.Format("Unknown TextAlignment {0}.", TextAlignment));
@@ -97,6 +101,12 @@ namespace Tharga.Reporter.Engine.Entity.Element
                 if (renderData.DebugData != null)
                 {
                     renderData.Graphics.DrawRectangle(renderData.DebugData.Pen, new XRect(renderData.ElementBounds.Left, renderData.ElementBounds.Top, textSize.Width, textSize.Height));
+
+                    const int radius = 5;
+                    var l = renderData.ElementBounds.Left + adjustment;
+                    renderData.Graphics.DrawEllipse(renderData.DebugData.Pen, l - radius, renderData.ElementBounds.Top - radius, radius * 2, radius * 2);
+                    renderData.Graphics.DrawLine(renderData.DebugData.Pen, l - radius - 2, bounds.Top, l + radius + 2, bounds.Top);
+                    renderData.Graphics.DrawLine(renderData.DebugData.Pen, l, bounds.Top - radius - 2, l, bounds.Top + radius + 2);
                 }
             }
         }

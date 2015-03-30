@@ -1,5 +1,4 @@
 using System.Xml;
-using Tharga.Reporter.Engine.Entity.Area;
 using Tharga.Reporter.Engine.Entity.Util;
 using Tharga.Reporter.Engine.Interface;
 
