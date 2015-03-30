@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using Tharga.Reporter.Engine;
 using Tharga.Reporter.Engine.Entity;
 using Tharga.Toolkit.Console.Command.Base;
@@ -14,14 +15,19 @@ namespace Tharga.Reporter.SampleConsole.Commands.PdfCommands
             RegisterCommand(new CreateComplexCommand());
         }
 
-        public static void RenderPdf(Template template, DocumentProperties documentProperties = null, DocumentData documentData = null, bool debug = true)
+        public static async Task RenderPdfAsync(Template template, DocumentProperties documentProperties = null, DocumentData documentData = null, bool debug = true)
+        {
+            await Task.Factory.StartNew(() => RenderPdf(template, documentProperties, documentData, debug));
+        }
+
+        private static void RenderPdf(Template template, DocumentProperties documentProperties = null, DocumentData documentData = null, bool debug = true)
         {
             var renderer = new Renderer(template, documentData, true, documentProperties, debug);
             var bytes = renderer.GetPdfBinary();
-            ExecuteFile(bytes);
+            Task.Factory.StartNew(() => ExecuteFile(bytes));
         }
 
-        public static void ExecuteFile(byte[] byteArray)
+        private static void ExecuteFile(byte[] byteArray)
         {
             var fileName = string.Format("{0}.pdf", System.IO.Path.GetTempFileName());
             System.IO.File.WriteAllBytes(fileName, byteArray);

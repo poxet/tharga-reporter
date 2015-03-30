@@ -16,17 +16,17 @@ namespace Tharga.Reporter.SampleConsole.Commands.PdfCommands
         public override async Task<bool> InvokeAsync(string paramList)
         {
             var index = 0;
-            var documentProperties = CreateDocumentProperties(paramList, index);
+            var documentProperties = CreateDocumentProperties(paramList, ref index);
             var template = CreateTemplate();
 
-            var debug = QueryParam("Debug", GetParam(paramList, index++), () => new List<KeyValuePair<bool, string>> { new KeyValuePair<bool, string>(true, "Yes"), new KeyValuePair<bool, string>(true, "No") });
+            var debug = QueryParam("Debug", GetParam(paramList, index++), () => new List<KeyValuePair<bool, string>> { new KeyValuePair<bool, string>(true, "Yes"), new KeyValuePair<bool, string>(false, "No") });
 
-            PdfCommand.RenderPdf(template, documentProperties, null, debug);
+            await PdfCommand.RenderPdfAsync(template, documentProperties, null, debug);
 
             return true;
         }
 
-        private DocumentProperties CreateDocumentProperties(string paramList, int index)
+        private DocumentProperties CreateDocumentProperties(string paramList, ref int index)
         {
             var title = QueryParam<string>("Title", GetParam(paramList, index++));
             var author = QueryParam<string>("Author", GetParam(paramList, index++));
