@@ -27,6 +27,7 @@ namespace Tharga.Reporter.SampleConsole.Commands.PdfCommands
             sectionC.Pane.ElementList.Add(new TextBox { Width = "3cm", Height = "2cm", Value = "This is a text that spans over several pages. The first part should appear on one page and the last part on another." });
             sectionC.Pane.ElementList.Add(new TextBox { Left = "5cm", Width = "3cm", Height = "2cm", Value = "This is a short text." });
             sectionC.Pane.ElementList.Add(new TextBox { Left = "10cm", Width = "3cm", Height = "2cm", Value = "This is a short text for the last page only.", Visibility = PageVisibility.LastPage });
+            sectionC.Pane.ElementList.Add(new TextBox { Left = "15cm", Width = "3cm", Height = "2cm", Value = "This is a text for all pages but for the first one.", Visibility = PageVisibility.AllButFirst });
             template.SectionList.Add(sectionC);
 
             await PdfCommand.RenderPdfAsync(template);

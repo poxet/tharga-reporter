@@ -119,6 +119,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
             }
             else
                 _pageText.Add(new[] { text });
+
             return _pageText.Count;
         }
 
@@ -126,6 +127,10 @@ namespace Tharga.Reporter.Engine.Entity.Element
         {
             if (IsNotVisible(renderData))
                 return;
+
+            var pushTextForwardOnPages = 0;
+            if (Visibility == PageVisibility.LastPage && renderData.PageNumberInfo.TotalPages != page)
+                pushTextForwardOnPages = 1;
 
             if (_pageText == null) throw new InvalidOperationException("Pre-render has not been performed.");
 
@@ -146,9 +151,9 @@ namespace Tharga.Reporter.Engine.Entity.Element
             var left = renderData.ElementBounds.Left;
             var top = renderData.ElementBounds.Top;
 
-            if (_pageText.Count > page - renderData.Section.GetPageOffset())
+            if (_pageText.Count > page - renderData.Section.GetPageOffset() - pushTextForwardOnPages)
             {
-                foreach (var line in _pageText[page - renderData.Section.GetPageOffset()])
+                foreach (var line in _pageText[page - renderData.Section.GetPageOffset() - pushTextForwardOnPages])
                 {
                     renderData.Graphics.DrawString(line, font, brush, new XPoint(left, top), XStringFormats.TopLeft);
                     var newTextSize = renderData.Graphics.MeasureString(line, font, XStringFormats.TopLeft);

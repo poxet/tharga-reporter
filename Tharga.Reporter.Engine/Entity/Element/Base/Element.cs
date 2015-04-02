@@ -74,7 +74,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
         protected abstract XRect GetBounds(XRect parentBounds);
         protected abstract bool HorixontalSwap(XRect parentBounds);
         protected abstract bool VerticalSwap(XRect parentBounds);
-
+        
         internal bool IsNotVisible(IRenderData renderData)
         {
             if (Visibility != PageVisibility.All
