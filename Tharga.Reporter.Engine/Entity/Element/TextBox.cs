@@ -46,7 +46,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
         {
             _pageText = new List<string[]>();
 
-            renderData.ElementBounds = GetBounds(renderData.ParentBounds);
+            var maxBounds = GetBounds(renderData.ParentBounds);
 
             if (!renderData.IncludeBackground && IsBackground)
                 return 0;
@@ -57,10 +57,10 @@ namespace Tharga.Reporter.Engine.Entity.Element
             var text = GetValue(renderData.DocumentData, renderData.PageNumberInfo, renderData.DocumentProperties);
             var textSize = renderData.Graphics.MeasureString(text, font, XStringFormats.TopLeft);
 
-            var left = renderData.ElementBounds.Left;
-            var top = renderData.ElementBounds.Top;
+            var left = maxBounds.Left;
+            var top = maxBounds.Top;
 
-            if (textSize.Width > renderData.ElementBounds.Width || text.Contains(Environment.NewLine))
+            if (textSize.Width > maxBounds.Width || text.Contains(Environment.NewLine))
             {
                 //Need to set data over more than one page
                 var words = text.Split(' ');
@@ -84,7 +84,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
                         var nextTextSize = renderData.Graphics.MeasureString(sb.ToString(), font, XStringFormats.TopLeft);
 
                         //Now we are over the limit (Previous state will fit)
-                        if (nextTextSize.Width > renderData.ElementBounds.Width || nw == Environment.NewLine)
+                        if (nextTextSize.Width > maxBounds.Width || nw == Environment.NewLine)
                         {
                             if (string.IsNullOrEmpty(textSoFar))
                             {
@@ -103,12 +103,12 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
                             top += nextTextSize.Height;
 
-                            if (top > renderData.ElementBounds.Bottom - nextTextSize.Height)
+                            if (top > maxBounds.Bottom - nextTextSize.Height)
                             {
                                 //Now we have reached the limit of the page
                                 _pageText.Add(lines.ToArray());
                                 lines.Clear();
-                                top = renderData.ElementBounds.Top;
+                                top = maxBounds.Top;
                             }
                         }
                     }
@@ -119,6 +119,11 @@ namespace Tharga.Reporter.Engine.Entity.Element
             }
             else
                 _pageText.Add(new[] { text });
+
+            if (Height == null)
+                renderData.ElementBounds = new XRect { Location = maxBounds.Location, Width = maxBounds.Width, Height = top - maxBounds.Top };
+            else
+                renderData.ElementBounds = maxBounds;
 
             return _pageText.Count;
         }
@@ -134,13 +139,10 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
             if (_pageText == null) throw new InvalidOperationException("Pre-render has not been performed.");
 
-            renderData.ElementBounds = GetBounds(renderData.ParentBounds);
+            var maxBounds = GetBounds(renderData.ParentBounds);
 
             if (!renderData.IncludeBackground && IsBackground)
                 return;
-
-            if (renderData.DebugData != null)
-                renderData.Graphics.DrawRectangle(renderData.DebugData.Pen, renderData.ElementBounds);
 
             var font = new XFont(_font.GetName(renderData.Section), _font.GetSize(renderData.Section), _font.GetStyle(renderData.Section));
             var brush = new XSolidBrush(XColor.FromArgb(_font.GetColor(renderData.Section)));
@@ -148,8 +150,8 @@ namespace Tharga.Reporter.Engine.Entity.Element
             var text = GetValue(renderData.DocumentData, renderData.PageNumberInfo, renderData.DocumentProperties);
             var textSize = renderData.Graphics.MeasureString(text, font, XStringFormats.TopLeft);
 
-            var left = renderData.ElementBounds.Left;
-            var top = renderData.ElementBounds.Top;
+            var left = maxBounds.Left;
+            var top = maxBounds.Top;
 
             if (_pageText.Count > page - renderData.Section.GetPageOffset() - pushTextForwardOnPages)
             {
@@ -160,6 +162,14 @@ namespace Tharga.Reporter.Engine.Entity.Element
                     top += newTextSize.Height;
                 }
             }
+
+            if (Height == null)
+                renderData.ElementBounds = new XRect { Location = maxBounds.Location, Width = maxBounds.Width, Height = top - maxBounds.Top };
+            else
+                renderData.ElementBounds = maxBounds;
+
+            if (renderData.DebugData != null)
+                renderData.Graphics.DrawRectangle(renderData.DebugData.Pen, renderData.ElementBounds);
         }
 
         private string GetValue(IDocumentData documentData, PageNumberInfo pageNumberInfo, DocumentProperties documentProperties)
