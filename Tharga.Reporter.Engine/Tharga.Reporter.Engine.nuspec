@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package>
   <metadata>
-    <id>$id$</id>
+    <id>Tharga.Reporter</id>
     <version>$version$</version>
     <title>Tharga Reporter</title>
-    <authors>Thargelion AB</authors>
+    <authors>Poxet</authors>
     <description>Create and manage XML templates for print and PDF output.</description>
     <projectUrl>https://github.com/poxet/tharga-reporter</projectUrl>
-    <iconUrl>http://support.thargelion.se/Images/ThargelionIcon.png</iconUrl>
+    <iconUrl>http://www.thargelion.se/Images/Logotype/Thargelion-White-Icon-48.png</iconUrl>
     <language>en-US</language>
     <tags>PDF print template printer</tags>
   </metadata>
