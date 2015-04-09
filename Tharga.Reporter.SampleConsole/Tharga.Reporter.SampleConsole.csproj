@@ -42,11 +42,16 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Tharga.Toolkit.Console">
-      <HintPath>..\packages\Tharga.Toolkit.Console.1.4.5.0\lib\net45\Tharga.Toolkit.Console.dll</HintPath>
+    <Reference Include="Tharga.Toolkit.Console, Version=1.4.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Tharga.Toolkit.Console.1.4.7.0\lib\net45\Tharga.Toolkit.Console.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\ExampleCommands\InvoiceExampleCommand.cs" />
+    <Compile Include="Commands\ExampleCommands\ExampleCommands.cs" />
+    <Compile Include="Commands\ExampleCommands\InvoiceArticleNoteCommand.cs" />
+    <Compile Include="Extensions\LinqExtensions.cs" />
     <Compile Include="Commands\PdfCommands\CreateBlankCommand.cs" />
     <Compile Include="Commands\PdfCommands\CreateComplexCommand.cs" />
     <Compile Include="Commands\PdfCommands\CreateFooterCommand.cs" />

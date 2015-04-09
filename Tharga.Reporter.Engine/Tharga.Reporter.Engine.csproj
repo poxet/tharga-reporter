@@ -56,11 +56,9 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Aspose.BarCode">
-      <HintPath>..\packages\Aspose.BarCode.5.9.0.0\lib\net45\Aspose.BarCode.dll</HintPath>
-    </Reference>
-    <Reference Include="Aspose.BarCodeRecognition">
-      <HintPath>..\packages\Aspose.BarCode.5.9.0.0\lib\net45\Aspose.BarCodeRecognition.dll</HintPath>
+    <Reference Include="Aspose.BarCode, Version=6.8.0.0, Culture=neutral, PublicKeyToken=716fcc553a201e56, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Aspose.BarCode.6.8.0\lib\net4.5\Aspose.BarCode.dll</HintPath>
     </Reference>
     <Reference Include="MigraDoc.DocumentObjectModel">
       <HintPath>..\packages\PDFsharp-MigraDoc-GDI.1.32.4334.0\lib\net20\MigraDoc.DocumentObjectModel.dll</HintPath>
