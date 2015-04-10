@@ -251,7 +251,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
                     }
 
                     var totalWidth = renderData.ElementBounds.Width;
-                    var nonSpringWidth = _columns.Where(x => x.Value.WidthMode != WidthMode.Spring).Sum(x => x.Value.Width.Value != null ? x.Value.Width.Value.GetXUnitValue(totalWidth) : 0);
+                    var nonSpringWidth = _columns.Where(x => x.Value.WidthMode != WidthMode.Spring).Sum(x => x.Value.Width != null ? x.Value.Width.Value.GetXUnitValue(totalWidth) : 0);
 
                     if (springCount > 0)
                     {
