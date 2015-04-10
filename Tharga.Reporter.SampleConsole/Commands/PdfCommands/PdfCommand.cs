@@ -16,6 +16,7 @@ namespace Tharga.Reporter.SampleConsole.Commands.PdfCommands
             RegisterCommand(new CreateComplexCommand());
             RegisterCommand(new CreateMutiSection());
             RegisterCommand(new CreateManual());
+            RegisterCommand(new CreateTableCommand());
         }
 
         public static async Task RenderPdfAsync(Template template, DocumentProperties documentProperties = null, DocumentData documentData = null, bool debug = true)

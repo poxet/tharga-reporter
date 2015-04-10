@@ -51,6 +51,7 @@
     <Compile Include="Commands\ExampleCommands\InvoiceExampleCommand.cs" />
     <Compile Include="Commands\ExampleCommands\ExampleCommands.cs" />
     <Compile Include="Commands\ExampleCommands\InvoiceArticleNoteCommand.cs" />
+    <Compile Include="Commands\PdfCommands\CreateTableCommand.cs" />
     <Compile Include="Extensions\LinqExtensions.cs" />
     <Compile Include="Commands\PdfCommands\CreateBlankCommand.cs" />
     <Compile Include="Commands\PdfCommands\CreateComplexCommand.cs" />
