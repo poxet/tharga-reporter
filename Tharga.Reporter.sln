@@ -20,7 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{EB79DF9A
 		Build\Release.msbuild = Build\Release.msbuild
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tharga.Reporter.SampleConsole", "Tharga.Reporter.SampleConsole\Tharga.Reporter.SampleConsole.csproj", "{4780A238-ADA6-4481-A43E-94F3C9407B18}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tharga.Reporter.ConsoleSample", "Tharga.Reporter.SampleConsole\Tharga.Reporter.ConsoleSample.csproj", "{4780A238-ADA6-4481-A43E-94F3C9407B18}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tharga.Reporter.Tests", "Tharga.Reporter.Tests\Tharga.Reporter.Tests.csproj", "{93EEF54E-3D63-4F74-A729-BB812986A82E}"
 EndProject
@@ -31,6 +31,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{BA7EF74A-D6F1-4EC4-AC07-32E2BFE921EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tharga.Reporter.WPFSample", "Tharga.Reporter.WPFSample\Tharga.Reporter.WPFSample.csproj", "{4294B693-441E-4434-9B2C-DDA60C86A0FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -90,12 +92,28 @@ Global
 		{93EEF54E-3D63-4F74-A729-BB812986A82E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{93EEF54E-3D63-4F74-A729-BB812986A82E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{93EEF54E-3D63-4F74-A729-BB812986A82E}.Release|x86.ActiveCfg = Release|Any CPU
+		{4294B693-441E-4434-9B2C-DDA60C86A0FE}.CI|Any CPU.ActiveCfg = Release|Any CPU
+		{4294B693-441E-4434-9B2C-DDA60C86A0FE}.CI|Any CPU.Build.0 = Release|Any CPU
+		{4294B693-441E-4434-9B2C-DDA60C86A0FE}.CI|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4294B693-441E-4434-9B2C-DDA60C86A0FE}.CI|Mixed Platforms.Build.0 = Release|Any CPU
+		{4294B693-441E-4434-9B2C-DDA60C86A0FE}.CI|x86.ActiveCfg = Release|Any CPU
+		{4294B693-441E-4434-9B2C-DDA60C86A0FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4294B693-441E-4434-9B2C-DDA60C86A0FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4294B693-441E-4434-9B2C-DDA60C86A0FE}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4294B693-441E-4434-9B2C-DDA60C86A0FE}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4294B693-441E-4434-9B2C-DDA60C86A0FE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4294B693-441E-4434-9B2C-DDA60C86A0FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4294B693-441E-4434-9B2C-DDA60C86A0FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4294B693-441E-4434-9B2C-DDA60C86A0FE}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4294B693-441E-4434-9B2C-DDA60C86A0FE}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4294B693-441E-4434-9B2C-DDA60C86A0FE}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4780A238-ADA6-4481-A43E-94F3C9407B18} = {BA7EF74A-D6F1-4EC4-AC07-32E2BFE921EB}
+		{4294B693-441E-4434-9B2C-DDA60C86A0FE} = {BA7EF74A-D6F1-4EC4-AC07-32E2BFE921EB}
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Tharga.Reporter.vsmdi

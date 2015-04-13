@@ -7,7 +7,7 @@ using Tharga.Reporter.Engine.Entity.Util;
 using Tharga.Toolkit.Console.Command.Base;
 using Font = Tharga.Reporter.Engine.Entity.Font;
 
-namespace Tharga.Reporter.SampleConsole.Commands.PdfCommands
+namespace Tharga.Reporter.ConsoleSample.Commands.PdfCommands
 {
     public class CreateTableCommand : ActionCommandBase
     {

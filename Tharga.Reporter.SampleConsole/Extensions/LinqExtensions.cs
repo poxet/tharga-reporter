@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Tharga.Reporter.SampleConsole.Commands.ExampleCommands
+namespace Tharga.Reporter.ConsoleSample.Extensions
 {
     public static class LinqExtensions
     {

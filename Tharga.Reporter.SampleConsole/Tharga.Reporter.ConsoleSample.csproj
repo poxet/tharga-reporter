@@ -7,8 +7,8 @@
     <ProjectGuid>{4780A238-ADA6-4481-A43E-94F3C9407B18}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tharga.Reporter.SampleConsole</RootNamespace>
-    <AssemblyName>Tharga.Reporter.SampleConsole</AssemblyName>
+    <RootNamespace>Tharga.Reporter.ConsoleSample</RootNamespace>
+    <AssemblyName>Tharga.Reporter.ConsoleSample</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>

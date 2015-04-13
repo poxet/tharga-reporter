@@ -2,15 +2,16 @@
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
+using Tharga.Reporter.ConsoleSample.Commands.PdfCommands;
+using Tharga.Reporter.ConsoleSample.Extensions;
 using Tharga.Reporter.Engine.Entity;
 using Tharga.Reporter.Engine.Entity.Element;
 using Tharga.Reporter.Engine.Entity.Util;
-using Tharga.Reporter.SampleConsole.Commands.PdfCommands;
 using Tharga.Toolkit.Console.Command.Base;
 using Font = Tharga.Reporter.Engine.Entity.Font;
 using Image = Tharga.Reporter.Engine.Entity.Element.Image;
 
-namespace Tharga.Reporter.SampleConsole.Commands.ExampleCommands
+namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
 {
     public class InvoiceExampleCommand : ActionCommandBase
     {

@@ -3,7 +3,7 @@ using Tharga.Reporter.Engine.Entity;
 using Tharga.Reporter.Engine.Entity.Element;
 using Tharga.Toolkit.Console.Command.Base;
 
-namespace Tharga.Reporter.SampleConsole.Commands.PdfCommands
+namespace Tharga.Reporter.ConsoleSample.Commands.PdfCommands
 {
     public class CreateMutiSection : ActionCommandBase
     {

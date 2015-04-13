@@ -1,10 +1,10 @@
-﻿using Tharga.Reporter.SampleConsole.Commands.ExampleCommands;
-using Tharga.Reporter.SampleConsole.Commands.PdfCommands;
+﻿using Tharga.Reporter.ConsoleSample.Commands.ExampleCommands;
+using Tharga.Reporter.ConsoleSample.Commands.PdfCommands;
 using Tharga.Toolkit.Console;
 using Tharga.Toolkit.Console.Command;
 using Tharga.Toolkit.Console.Command.Base;
 
-namespace Tharga.Reporter.SampleConsole
+namespace Tharga.Reporter.ConsoleSample
 {
     public static class Program
     {

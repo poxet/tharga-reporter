@@ -7,7 +7,7 @@ using Tharga.Toolkit.Console.Command.Base;
 using Font = Tharga.Reporter.Engine.Entity.Font;
 using Rectangle = Tharga.Reporter.Engine.Entity.Element.Rectangle;
 
-namespace Tharga.Reporter.SampleConsole.Commands.PdfCommands
+namespace Tharga.Reporter.ConsoleSample.Commands.PdfCommands
 {
     public class CreateComplexCommand : ActionCommandBase
     {

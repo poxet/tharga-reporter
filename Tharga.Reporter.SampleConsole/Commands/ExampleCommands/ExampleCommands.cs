@@ -1,6 +1,6 @@
 ﻿using Tharga.Toolkit.Console.Command.Base;
 
-namespace Tharga.Reporter.SampleConsole.Commands.ExampleCommands
+namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
 {
     public class ExampleCommands : ContainerCommandBase
     {
