@@ -61,7 +61,7 @@ namespace Tharga.Reporter.WPFSample
                     }
                 }
 
-                var renderer = new Renderer(template, documentData, true, documentProperties, pageSizeInfo, debug);
+                var renderer = new Renderer(template, documentData, documentProperties, pageSizeInfo, debug);
 
                 //Send document to the printer
                 renderer.Print(printerSettings);

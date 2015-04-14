@@ -140,7 +140,7 @@ namespace Tharga.Reporter.Tests.Serializing
             graphicsMock.Setup(x => x.DrawLine(It.IsAny<XPen>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<double>()));
             var graphicsFactoryMock = new Mock<IGraphicsFactory>(MockBehavior.Strict);
             graphicsFactoryMock.Setup(x => x.PrepareGraphics(It.IsAny<PdfPage>(), It.IsAny<DocumentRenderer>(), It.IsAny<int>())).Returns(graphicsMock.Object);
-            var renderer = new Renderer(graphicsFactoryMock.Object, template, null, true, null, null, true);
+            var renderer = new Renderer(graphicsFactoryMock.Object, template, null, null, null, true);
 
             //Act
             var data = renderer.GetPdfBinary();

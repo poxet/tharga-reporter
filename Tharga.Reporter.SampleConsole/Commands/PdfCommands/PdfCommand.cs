@@ -26,8 +26,8 @@ namespace Tharga.Reporter.ConsoleSample.Commands.PdfCommands
 
         private static void RenderPdf(Template template, DocumentProperties documentProperties = null, DocumentData documentData = null, PageSizeInfo pageSizeInfo = null, bool debug = true)
         {
-            var renderer = new Renderer(template, documentData, true, documentProperties, pageSizeInfo, debug);
-            var bytes = renderer.GetPdfBinary();
+            var renderer = new Renderer(template, documentData, documentProperties, pageSizeInfo, debug);
+            var bytes = renderer.GetPdfBinary(true);
             Task.Factory.StartNew(() => ExecuteFile(bytes));
         }
 

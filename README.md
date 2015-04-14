@@ -221,14 +221,14 @@ Rendering is what you do to create the actual document. This is where the templa
 There is a *Renderer* object that you will have to create...
 
 ```
-var renderer = new Renderer(template, documentData, true, documentProperties, debug);
+var renderer = new Renderer(template, documentData, documentProperties, pageSizeInfo, debug);
 ```
 
 The parameters to send to the constructor is
 - template - The actual template
 - documentData - The data part
-- includeBackgroundObjects - If set to true, all elements with the property *IsBackground=true* will be rendered.
 - documentProperties - Properties for the document.
+- PageSizeInfo - Information about the size of the document to be rendered (A4, A3, Letter or custom)
 - debug - Lines and information will be outputet (in blue), so that you can see what is going on.
 
 ##### DocumentProperties
@@ -237,6 +237,10 @@ Properties used for PDF documents.
 - Subject
 - Title
 - Creator
+
+##### PageSizeInfo
+The parameter *PageSizeInfo* is used to the the size of the document to render. You can create this object by using a named page size as A4, A3 or Letter.
+It is also possible to create custom size documents for labels.
 
 ##### IncludeBackgroundObjects
 If you have pre-printed papers with logotypes and address information and want to use the same template for PDF documents and print documents this is a great feature.
@@ -249,12 +253,13 @@ When you have your renderer you can choose if you want it created as s PDF or se
 There are two ways of doing this, ither just save it as a pdf file on disk. (ie. renderer.CreatePdfFile("MyDocument.pdf");)
 If you want to send the pdf from a server to a client or email it you can get the binary data for the pdf instead. (ie. var bytes = renderer.GetPdfBinary();)
 
-You can provide a parameter with what *PageSize* you want to generate for the pdf.
+You can provide a parameter *includeBackgroundObjects*. If set to true, all elements with the property *IsBackground=true* will be rendered.
 
 ##### To the printer
 When sending the document to a printer the regular printer settings object is used. If you want to use the default printer directly just create a new object (ie. new PrinterSettings { Copies = 1 }).
 You can also use the common windows dialog to get the object...
 
+Example for WPF
 ```
 var dialog = new PrintDialog
 {

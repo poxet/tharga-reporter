@@ -20,19 +20,18 @@ namespace Tharga.Reporter.Engine
     {
         private readonly Template _template;
         private readonly DocumentData _documentData;
-        private readonly bool _includeBackgroundObjects;
         private readonly DocumentProperties _documentProperties;
         private readonly IDebugData _debugData;
         private readonly IGraphicsFactory _graphicsFactory;
         private readonly PageSizeInfo _pageSizeInfo;
         private int _printPageCount;
         private bool _preRendered;
+        private bool _includeBackgroundObjects = true;
 
-        internal Renderer(IGraphicsFactory graphicsFactory, Template template, DocumentData documentData = null, bool includeBackgroundObjects = true, DocumentProperties documentProperties = null, PageSizeInfo pageSizeInfo = null, bool debug = false)
+        internal Renderer(IGraphicsFactory graphicsFactory, Template template, DocumentData documentData = null, DocumentProperties documentProperties = null, PageSizeInfo pageSizeInfo = null, bool debug = false)
         {
             _template = template;
             _documentData = documentData;
-            _includeBackgroundObjects = includeBackgroundObjects;
             _documentProperties = documentProperties;
             _pageSizeInfo = pageSizeInfo ?? new PageSizeInfo(PageSize.A4);
             if (debug)
@@ -40,38 +39,39 @@ namespace Tharga.Reporter.Engine
             _graphicsFactory = graphicsFactory;
         }
 
-        public Renderer(Template template, DocumentData documentData = null, bool includeBackgroundObjects = true, DocumentProperties documentProperties = null, PageSizeInfo pageSizeInfo = null, bool debug = false)
-            : this(new MyGraphicsFactory(), template, documentData, includeBackgroundObjects, documentProperties, pageSizeInfo, debug)
+        public Renderer(Template template, DocumentData documentData = null, DocumentProperties documentProperties = null, PageSizeInfo pageSizeInfo = null, bool debug = false)
+            : this(new MyGraphicsFactory(), template, documentData, documentProperties, pageSizeInfo, debug)
         {
         }
 
-        public void CreatePdfFile(string fileName)
+        public void CreatePdfFile(string fileName, bool includeBackgroundObjects = true)
         {
             if (System.IO.File.Exists(fileName))
                 throw new InvalidOperationException("The file already exists.").AddData("fileName", fileName);
 
-            System.IO.File.WriteAllBytes(fileName, GetPdfBinary());
+            System.IO.File.WriteAllBytes(fileName, GetPdfBinary(includeBackgroundObjects));
         }
 
-        public byte[] GetPdfBinary()
+        public byte[] GetPdfBinary(bool includeBackgroundObjects = true)
         {
-            PreRender(_pageSizeInfo);
+            PreRender(_pageSizeInfo, includeBackgroundObjects);
 
             var pdfDocument = CreatePdfDocument();
-            RenderPdfDocument(pdfDocument, false, _pageSizeInfo);
+            RenderPdfDocument(pdfDocument, false, _pageSizeInfo, includeBackgroundObjects);
 
             var memStream = new System.IO.MemoryStream();
             pdfDocument.Save(memStream);
             return memStream.ToArray();
         }
 
-        public void Print(PrinterSettings printerSettings)
+        public void Print(PrinterSettings printerSettings, bool includeBackgroundObjects = true)
         {
             _printPageCount = 0;
+            _includeBackgroundObjects = includeBackgroundObjects;
 
             var pageSizeInfo = new PageSizeInfo(printerSettings.DefaultPageSettings.PaperSize.Kind.ToString());
 
-            PreRender(pageSizeInfo);
+            PreRender(pageSizeInfo, includeBackgroundObjects);
 
             var doc = GetDocument(false);
 
@@ -88,7 +88,7 @@ namespace Tharga.Reporter.Engine
             printDocument.Print();
         }
 
-        private void RenderPdfDocument(PdfDocument pdfDocument, bool preRender, PageSizeInfo pageSizeInfo)
+        private void RenderPdfDocument(PdfDocument pdfDocument, bool preRender, PageSizeInfo pageSizeInfo, bool includeBackgroundObjects)
         {
             if (_preRendered && preRender)
                 throw new InvalidOperationException("Prerender has already been performed.");
@@ -104,7 +104,7 @@ namespace Tharga.Reporter.Engine
 
                 var gfx = _graphicsFactory.PrepareGraphics(page, docRenderer, ii);
 
-                DoRenderStuff(gfx, new XRect(0, 0, page.Width, page.Height), preRender, ii, _template.SectionList.Sum(x => x.GetRenderPageCount()));
+                DoRenderStuff(gfx, new XRect(0, 0, page.Width, page.Height), preRender, ii, _template.SectionList.Sum(x => x.GetRenderPageCount()), includeBackgroundObjects);
             }
 
             if (preRender)
@@ -170,7 +170,7 @@ namespace Tharga.Reporter.Engine
             return pdfDocument;
         }
 
-        private void PreRender(PageSizeInfo pageSizeInfo)
+        private void PreRender(PageSizeInfo pageSizeInfo, bool includeBackgroundObjects)
         {
             //TODO: If prerender with one format (pageSize) and printing with another.
             //or, if template or document data changed between render and pre-render then things will be messed up.
@@ -180,7 +180,7 @@ namespace Tharga.Reporter.Engine
                 if (hasMultiPageElements)
                 {
                     var pdfDocument = CreatePdfDocument();
-                    RenderPdfDocument(pdfDocument, true, pageSizeInfo);
+                    RenderPdfDocument(pdfDocument, true, pageSizeInfo, includeBackgroundObjects);
                 }
             }
         }
@@ -194,7 +194,7 @@ namespace Tharga.Reporter.Engine
             var gfx = XGraphics.FromGraphics(e.Graphics, rawSize, XGraphicsUnit.Point);
             gfx.ScaleTransform(scale);
 
-            DoRenderStuff(new MyGraphics(gfx), new XRect(unitSize), false, _printPageCount++, _template.SectionList.Sum(x => x.GetRenderPageCount()));
+            DoRenderStuff(new MyGraphics(gfx), new XRect(unitSize), false, _printPageCount++, _template.SectionList.Sum(x => x.GetRenderPageCount()), _includeBackgroundObjects);
         }
 
         private static XSize GetSize(XSize rawSize)
@@ -223,7 +223,7 @@ namespace Tharga.Reporter.Engine
             return size;
         }
 
-        private void DoRenderStuff(IGraphics gfx, XRect size, bool preRender, int page, int? totalPages)
+        private void DoRenderStuff(IGraphics gfx, XRect size, bool preRender, int page, int? totalPages, bool includeBackgroundObjects)
         {
             var postRendering = new List<Action>();
 
@@ -256,7 +256,7 @@ namespace Tharga.Reporter.Engine
             var footerHeight = section.Footer.Height.GetXUnitValue(sectionBounds.Height);
             var paneBounds = new XRect(sectionBounds.Left, sectionBounds.Top + headerHeight, sectionBounds.Width, sectionBounds.Height - headerHeight - footerHeight);
 
-            var renderData = new RenderData(gfx, paneBounds, section, _documentData, pageNumberInfo, _debugData, _includeBackgroundObjects, _documentProperties);
+            var renderData = new RenderData(gfx, paneBounds, section, _documentData, pageNumberInfo, _debugData, includeBackgroundObjects, _documentProperties);
 
             if (preRender)
             {
@@ -277,7 +277,7 @@ namespace Tharga.Reporter.Engine
                         throw new InvalidOperationException("No height for the header has been set.");
 
                     var bounds = new XRect(sectionBounds.Left, sectionBounds.Top, sectionBounds.Width, headerHeight);
-                    var renderDataHeader = new RenderData(gfx, bounds, section, _documentData, pageNumberInfo, _debugData, _includeBackgroundObjects, _documentProperties);
+                    var renderDataHeader = new RenderData(gfx, bounds, section, _documentData, pageNumberInfo, _debugData, includeBackgroundObjects, _documentProperties);
                     postRendering.Add(() => section.Header.Render(renderDataHeader, page));
 
                     if (_debugData != null)
@@ -293,7 +293,7 @@ namespace Tharga.Reporter.Engine
                         throw new InvalidOperationException("No height for the footer has been set.");
 
                     var bounds = new XRect(sectionBounds.Left, sectionBounds.Bottom - footerHeight, sectionBounds.Width, footerHeight);
-                    var renderDataFooter = new RenderData(gfx, bounds, section, _documentData, pageNumberInfo, _debugData, _includeBackgroundObjects, _documentProperties);
+                    var renderDataFooter = new RenderData(gfx, bounds, section, _documentData, pageNumberInfo, _debugData, includeBackgroundObjects, _documentProperties);
                     postRendering.Add(() => section.Footer.Render(renderDataFooter, page));
 
                     if (_debugData != null)
