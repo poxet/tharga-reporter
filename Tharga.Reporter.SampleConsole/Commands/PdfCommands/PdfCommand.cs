@@ -19,14 +19,14 @@ namespace Tharga.Reporter.ConsoleSample.Commands.PdfCommands
             RegisterCommand(new CreateTableCommand());
         }
 
-        public static async Task RenderPdfAsync(Template template, DocumentProperties documentProperties = null, DocumentData documentData = null, bool debug = true)
+        public static async Task RenderPdfAsync(Template template, DocumentProperties documentProperties = null, DocumentData documentData = null, PageSizeInfo pageSizeInfo = null, bool debug = true)
         {
-            await Task.Factory.StartNew(() => RenderPdf(template, documentProperties, documentData, debug));
+            await Task.Factory.StartNew(() => RenderPdf(template, documentProperties, documentData, pageSizeInfo, debug));
         }
 
-        private static void RenderPdf(Template template, DocumentProperties documentProperties = null, DocumentData documentData = null, bool debug = true)
+        private static void RenderPdf(Template template, DocumentProperties documentProperties = null, DocumentData documentData = null, PageSizeInfo pageSizeInfo = null, bool debug = true)
         {
-            var renderer = new Renderer(template, documentData, true, documentProperties, debug);
+            var renderer = new Renderer(template, documentData, true, documentProperties, pageSizeInfo, debug);
             var bytes = renderer.GetPdfBinary();
             Task.Factory.StartNew(() => ExecuteFile(bytes));
         }

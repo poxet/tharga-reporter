@@ -109,7 +109,6 @@
     <Compile Include="Entity\Element\Extensions\FontExtensions.cs" />
     <Compile Include="Entity\Element\Image.cs" />
     <Compile Include="Entity\Util\PageRowSet.cs" />
-    <Compile Include="Extensions\PdfSharpExtensions.cs" />
     <Compile Include="Interface\IDebugData.cs" />
     <Compile Include="Interface\IGraphics.cs" />
     <Compile Include="Interface\IGraphicsFactory.cs" />
@@ -130,6 +129,7 @@
     <Compile Include="Extensions\ExceptionExtension.cs" />
     <Compile Include="MyGraphics.cs" />
     <Compile Include="MyGraphicsFactory.cs" />
+    <Compile Include="PageSizeInfo.cs" />
     <Compile Include="Renderer.cs" />
     <Compile Include="Entity\Element\Base\AreaElement.cs" />
     <Compile Include="Entity\Area\Footer.cs" />

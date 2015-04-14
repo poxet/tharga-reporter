@@ -32,7 +32,7 @@ namespace Tharga.Reporter.ConsoleSample.Commands.PdfCommands
 
             var documentProperties = CreateDocumentProperties();
 
-            await PdfCommand.RenderPdfAsync(template, documentProperties, data, false);
+            await PdfCommand.RenderPdfAsync(template, documentProperties, data, null, false);
 
             return true;
         }

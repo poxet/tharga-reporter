@@ -37,7 +37,7 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
             var documentProperties = new DocumentProperties();
             var sampleData = new DocumentData();
 
-            await PdfCommand.RenderPdfAsync(template, documentProperties, sampleData, false);
+            await PdfCommand.RenderPdfAsync(template, documentProperties, sampleData, null, false);
 
             //TODO: Get the xml
             //var xme = template.ToXml();

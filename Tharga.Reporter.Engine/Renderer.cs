@@ -12,56 +12,53 @@ using Tharga.Reporter.Engine.Entity.Element;
 using Tharga.Reporter.Engine.Entity.Util;
 using Tharga.Reporter.Engine.Interface;
 using Section = Tharga.Reporter.Engine.Entity.Section;
+using PdfSharp;
 
 namespace Tharga.Reporter.Engine
 {
     public class Renderer
     {
-        public enum PageSize
-        {
-            A4,
-            Letter
-        }
-
         private readonly Template _template;
         private readonly DocumentData _documentData;
         private readonly bool _includeBackgroundObjects;
         private readonly DocumentProperties _documentProperties;
         private readonly IDebugData _debugData;
         private readonly IGraphicsFactory _graphicsFactory;
+        private readonly PageSizeInfo _pageSizeInfo;
         private int _printPageCount;
         private bool _preRendered;
 
-        internal Renderer(IGraphicsFactory graphicsFactory, Template template, DocumentData documentData = null, bool includeBackgroundObjects = true, DocumentProperties documentProperties = null, bool debug = false)
+        internal Renderer(IGraphicsFactory graphicsFactory, Template template, DocumentData documentData = null, bool includeBackgroundObjects = true, DocumentProperties documentProperties = null, PageSizeInfo pageSizeInfo = null, bool debug = false)
         {
             _template = template;
             _documentData = documentData;
             _includeBackgroundObjects = includeBackgroundObjects;
             _documentProperties = documentProperties;
+            _pageSizeInfo = pageSizeInfo ?? new PageSizeInfo(PageSize.A4);
             if (debug)
                 _debugData = new DebugData();
             _graphicsFactory = graphicsFactory;
         }
 
-        public Renderer(Template template, DocumentData documentData = null, bool includeBackgroundObjects = true, DocumentProperties documentProperties = null, bool debug = false)
-            : this(new MyGraphicsFactory(), template, documentData, includeBackgroundObjects, documentProperties, debug)
+        public Renderer(Template template, DocumentData documentData = null, bool includeBackgroundObjects = true, DocumentProperties documentProperties = null, PageSizeInfo pageSizeInfo = null, bool debug = false)
+            : this(new MyGraphicsFactory(), template, documentData, includeBackgroundObjects, documentProperties, pageSizeInfo, debug)
         {
         }
 
-        public void CreatePdfFile(string fileName, PageSize pageSize = PageSize.A4)
+        public void CreatePdfFile(string fileName)
         {
             if (System.IO.File.Exists(fileName))
                 throw new InvalidOperationException("The file already exists.").AddData("fileName", fileName);
 
-            System.IO.File.WriteAllBytes(fileName, GetPdfBinary(pageSize));
+            System.IO.File.WriteAllBytes(fileName, GetPdfBinary());
         }
 
-        public byte[] GetPdfBinary(PageSize pageSize = PageSize.A4)
+        public byte[] GetPdfBinary()
         {
-            PreRender(pageSize);
+            PreRender(_pageSizeInfo);
 
             var pdfDocument = CreatePdfDocument();
-            RenderPdfDocument(pdfDocument, false, pageSize);
+            RenderPdfDocument(pdfDocument, false, _pageSizeInfo);
 
             var memStream = new System.IO.MemoryStream();
             pdfDocument.Save(memStream);
@@ -72,11 +69,9 @@ namespace Tharga.Reporter.Engine
         {
             _printPageCount = 0;
 
-            PageSize pageSize;
-            if (!Enum.TryParse(printerSettings.DefaultPageSettings.PaperSize.Kind.ToString(), out pageSize))
-                throw new InvalidOperationException(string.Format("Unable to parse {0} from as printerSettings to a page size.", printerSettings.DefaultPageSettings.PaperSize.Kind));
+            var pageSizeInfo = new PageSizeInfo(printerSettings.DefaultPageSettings.PaperSize.Kind.ToString());
 
-            PreRender(pageSize);
+            PreRender(pageSizeInfo);
 
             var doc = GetDocument(false);
 
@@ -93,7 +88,7 @@ namespace Tharga.Reporter.Engine
             printDocument.Print();
         }
 
-        private void RenderPdfDocument(PdfDocument pdfDocument, bool preRender, PageSize pageSize)
+        private void RenderPdfDocument(PdfDocument pdfDocument, bool preRender, PageSizeInfo pageSizeInfo)
         {
             if (_preRendered && preRender)
                 throw new InvalidOperationException("Prerender has already been performed.");
@@ -105,9 +100,7 @@ namespace Tharga.Reporter.Engine
 
             for (var ii = 0; ii < doc.Sections.Count; ii++)
             {
-                var page = pdfDocument.AddPage();
-
-                page.Size = pageSize.ToPageSize();
+                var page = AddPage(pdfDocument, pageSizeInfo);
 
                 var gfx = _graphicsFactory.PrepareGraphics(page, docRenderer, ii);
 
@@ -118,6 +111,23 @@ namespace Tharga.Reporter.Engine
             {
                 _preRendered = true;
             }
+        }
+
+        private static PdfPage AddPage(PdfDocument pdfDocument, PageSizeInfo pageSizeInfo)
+        {
+            var page = pdfDocument.AddPage();
+
+            if (pageSizeInfo.IsCustomSize)
+            {
+                page.Width = pageSizeInfo.Width;
+                page.Height = pageSizeInfo.Height;
+            }
+            else
+            {
+                page.Size = pageSizeInfo.PageSize;
+            }
+
+            return page;
         }
 
         private PdfDocument CreatePdfDocument()
@@ -160,7 +170,7 @@ namespace Tharga.Reporter.Engine
             return pdfDocument;
         }
 
-        private void PreRender(PageSize pageSize)
+        private void PreRender(PageSizeInfo pageSizeInfo)
         {
             //TODO: If prerender with one format (pageSize) and printing with another.
             //or, if template or document data changed between render and pre-render then things will be messed up.
@@ -170,7 +180,7 @@ namespace Tharga.Reporter.Engine
                 if (hasMultiPageElements)
                 {
                     var pdfDocument = CreatePdfDocument();
-                    RenderPdfDocument(pdfDocument, true, pageSize);
+                    RenderPdfDocument(pdfDocument, true, pageSizeInfo);
                 }
             }
         }

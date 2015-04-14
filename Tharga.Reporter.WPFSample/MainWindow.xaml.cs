@@ -7,10 +7,10 @@ using Section = Tharga.Reporter.Engine.Entity.Section;
 
 namespace Tharga.Reporter.WPFSample
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    using System;
+    using System.Printing;
+
+    public partial class MainWindow
     {
         public MainWindow()
         {
@@ -29,12 +29,9 @@ namespace Tharga.Reporter.WPFSample
 
             var sampleData = new DocumentData();
 
-            //await PdfCommand.RenderPdfAsync(template, documentProperties, sampleData, false);
             DocumentData documentData = null;
 
             var debug = false;
-
-            var renderer = new Renderer(template, documentData, true, documentProperties, debug);
 
             var dialog = new System.Windows.Controls.PrintDialog
             {
@@ -49,7 +46,28 @@ namespace Tharga.Reporter.WPFSample
                     Copies = (short)(dialog.PrintTicket.CopyCount ?? 1),
                     PrinterName = dialog.PrintQueue.FullName,
                 };
+
+                PageSizeInfo pageSizeInfo = null;
+                var pageMediaSize = dialog.PrintTicket.PageMediaSize;
+                if (pageMediaSize.PageMediaSizeName != null)
+                {
+                    try
+                    {
+                        pageSizeInfo = new PageSizeInfo(pageMediaSize.PageMediaSizeName.Value.ToString());
+                    }
+                    catch (ArgumentException)
+                    {
+                        pageSizeInfo = new PageSizeInfo(pageMediaSize.Width / 96 + "inch", pageMediaSize.Height / 96 + "inch");
+                    }
+                }
+
+                var renderer = new Renderer(template, documentData, true, documentProperties, pageSizeInfo, debug);
+
+                //Send document to the printer
                 renderer.Print(printerSettings);
+                
+                //Create a pdf for the same document
+                var data = renderer.GetPdfBinary();
             }
         }
     }

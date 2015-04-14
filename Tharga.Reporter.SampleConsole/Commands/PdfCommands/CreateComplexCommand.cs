@@ -24,7 +24,7 @@ namespace Tharga.Reporter.ConsoleSample.Commands.PdfCommands
 
             var debug = QueryParam("Debug", GetParam(paramList, index++), () => new List<KeyValuePair<bool, string>> { new KeyValuePair<bool, string>(true, "Yes"), new KeyValuePair<bool, string>(false, "No") });
 
-            await PdfCommand.RenderPdfAsync(template, documentProperties, null, debug);
+            await PdfCommand.RenderPdfAsync(template, documentProperties, null, null, debug);
 
             return true;
         }

@@ -1,8 +1,8 @@
 using System;
+using PdfSharp.Drawing;
 
 namespace Tharga.Reporter.Engine.Entity
 {
-    //TODO: Move stuff to extensions
     public struct UnitValue : IEquatable<UnitValue>
     {
         public enum EUnit
@@ -90,30 +90,42 @@ namespace Tharga.Reporter.Engine.Entity
             return string.Format("{0}{1}", Value.ToString("0.####").Replace(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator, "."), Unit.ToShortString());
         }
 
+        internal double GetXUnitValue()
+        {
+            return DoGetXUnitValue(null);
+        }
+
         internal double GetXUnitValue(double totalValue)
         {
-            PdfSharp.Drawing.XUnit value;
+            return DoGetXUnitValue(totalValue);
+        }
+
+        private double DoGetXUnitValue(double? totalValue)
+        {
+            XUnit value;
             switch (Unit)
             {
                 case EUnit.Millimeter:
-                    value = new PdfSharp.Drawing.XUnit(Value, PdfSharp.Drawing.XGraphicsUnit.Millimeter);
+                    value = new XUnit(Value, XGraphicsUnit.Millimeter);
                     break;
                 case EUnit.Centimeter:
-                    value = new PdfSharp.Drawing.XUnit(Value, PdfSharp.Drawing.XGraphicsUnit.Centimeter);
+                    value = new XUnit(Value, XGraphicsUnit.Centimeter);
                     break;
                 case EUnit.Inch:
-                    value = new PdfSharp.Drawing.XUnit(Value, PdfSharp.Drawing.XGraphicsUnit.Inch);
+                    value = new XUnit(Value, XGraphicsUnit.Inch);
                     break;
                 case EUnit.Percentage:
+                    if (totalValue == null)
+                        throw new InvalidOperationException("When unit type percentage is used, the totalValue needs to be provided.");
                     //Calculate the actual value, using provided total value
-                    return Value / 100 * totalValue;
+                    return Value / 100 * totalValue.Value;
                 case EUnit.Point:
                     return Value;
                 default:
                     throw new InvalidOperationException(string.Format("Unknown unit {0}", Unit));
             }
 
-            value.ConvertType(PdfSharp.Drawing.XGraphicsUnit.Point);
+            value.ConvertType(XGraphicsUnit.Point);
             return value.Value;
         }
 
