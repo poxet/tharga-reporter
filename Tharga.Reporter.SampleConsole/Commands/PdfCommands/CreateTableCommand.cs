@@ -114,8 +114,6 @@ namespace Tharga.Reporter.ConsoleSample.Commands.PdfCommands
                 var val = i * 70;
                 totalSum += val;
 
-                documentDataTable.AddRow(new Dictionary<string, string> { { "NameOfData", "Cell data" } });
-
                 documentDataTable.AddRow(new Dictionary<string, string>
                 {
                     { "FirstCol", "Col 1 Row " + i },

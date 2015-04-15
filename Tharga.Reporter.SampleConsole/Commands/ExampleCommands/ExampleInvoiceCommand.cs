@@ -13,13 +13,13 @@ using Image = Tharga.Reporter.Engine.Entity.Element.Image;
 
 namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
 {
-    public class InvoiceExampleCommand : ActionCommandBase
+    public class ExampleInvoiceCommand : ActionCommandBase
     {
         public static UnitValue SumTop = UnitValue.Parse("15cm");
         private static Font _tinyTitle;
         protected Font _dataFont = new Font { Size = 12, FontName = "Times", Bold = true };
 
-        public InvoiceExampleCommand() 
+        public ExampleInvoiceCommand() 
             : base("invoice", "Creates an example invoice")
         {
         }
@@ -36,6 +36,22 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
 
             var documentProperties = new DocumentProperties();
             var sampleData = new DocumentData();
+            var documentDataTable = new DocumentDataTable("OrderItems");
+            documentDataTable.AddRow(
+                new Dictionary<string, string>
+                    {
+                        { "Description", "A" },
+                        { "Details", "" },
+                        { "DateAdded", "C" },
+                        { "AddedBy", "D" },
+                        { "AmountDescription", "E" },
+                        { "Count", "F" },
+                        { "NetNormalItemPrice", "G" },
+                        { "DiscountPercentage", "H" },
+                        { "NetSaleItemPrice", "" },
+                        { "NetSaleTotalPrice", "J" },
+                    });
+            sampleData.Add(documentDataTable);
 
             await PdfCommand.RenderPdfAsync(template, documentProperties, sampleData, null, false);
 

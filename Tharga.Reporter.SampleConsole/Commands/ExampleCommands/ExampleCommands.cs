@@ -7,8 +7,8 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
         public ExampleCommands() 
             : base("example")
         {
-            RegisterCommand(new InvoiceExampleCommand());
-            RegisterCommand(new InvoiceArticleNoteCommand());
+            RegisterCommand(new ExampleInvoiceCommand());
+            RegisterCommand(new ExampleArticleNoteCommand());
         }
     }
 }
