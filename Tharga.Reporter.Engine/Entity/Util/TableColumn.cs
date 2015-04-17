@@ -17,7 +17,7 @@ namespace Tharga.Reporter.Engine.Entity.Util
         //TODO: Have an empty default constructor here as well. And set values later on. As for all other classes.
         internal TableColumn(string displayName, UnitValue? width, Table.WidthMode widthMode, Table.Alignment align, string hideValue)
         {
-            if (width == null && widthMode == Table.WidthMode.Specific) throw new InvalidOperationException("When not assigning a specific value for width the width mode cannot be set to specific.");
+            if (width == null && widthMode == Table.WidthMode.Specific) throw new InvalidOperationException("When not assigning a specific value for width the width mode cannot be set to specific.").AddData("Column", displayName);
 
             DisplayName = displayName;
             Width = width;

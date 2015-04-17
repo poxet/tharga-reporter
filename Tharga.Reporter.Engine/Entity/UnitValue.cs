@@ -90,17 +90,17 @@ namespace Tharga.Reporter.Engine.Entity
             return string.Format("{0}{1}", Value.ToString("0.####").Replace(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator, "."), Unit.ToShortString());
         }
 
-        internal double GetXUnitValue()
+        internal double GetXUnitValue(XGraphicsUnit type = XGraphicsUnit.Point)
         {
-            return DoGetXUnitValue(null);
+            return DoGetXUnitValue(null, type);
         }
 
-        internal double GetXUnitValue(double totalValue)
+        internal double GetXUnitValue(double totalValue, XGraphicsUnit type = XGraphicsUnit.Point)
         {
-            return DoGetXUnitValue(totalValue);
+            return DoGetXUnitValue(totalValue, type);
         }
 
-        private double DoGetXUnitValue(double? totalValue)
+        private double DoGetXUnitValue(double? totalValue, XGraphicsUnit type)
         {
             XUnit value;
             switch (Unit)
@@ -118,14 +118,16 @@ namespace Tharga.Reporter.Engine.Entity
                     if (totalValue == null)
                         throw new InvalidOperationException("When unit type percentage is used, the totalValue needs to be provided.");
                     //Calculate the actual value, using provided total value
-                    return Value / 100 * totalValue.Value;
+                    value = Value / 100 * totalValue.Value;
+                    break;
                 case EUnit.Point:
-                    return Value;
+                    value = Value;
+                    break;
                 default:
                     throw new InvalidOperationException(string.Format("Unknown unit {0}", Unit));
             }
 
-            value.ConvertType(XGraphicsUnit.Point);
+            value.ConvertType(type);
             return value.Value;
         }
 
@@ -161,6 +163,26 @@ namespace Tharga.Reporter.Engine.Entity
             if (((object)a) == ((object)b)) return false;
             if (((object)a) == null || ((object)b) == null) return true;
             return !a.Equals(b);
+        }
+
+        public static bool operator <(UnitValue c1, UnitValue c2)
+        {
+            return c1.GetXUnitValue() < c2.GetXUnitValue();
+        }
+
+        public static bool operator >(UnitValue c1, UnitValue c2)
+        {
+            return c1.GetXUnitValue() > c2.GetXUnitValue();
+        }
+
+        public static bool operator <=(UnitValue c1, UnitValue c2)
+        {
+            return c1.GetXUnitValue() <= c2.GetXUnitValue();
+        }
+
+        public static bool operator >=(UnitValue c1, UnitValue c2)
+        {
+            return c1.GetXUnitValue() >= c2.GetXUnitValue();
         }
 
         public static implicit operator string(UnitValue item)

@@ -45,6 +45,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
         private Font _groupFont;
         private Color? _groupBorderColor;
         private Color? _groupBackgroundColor;
+        private Color? _columnBorderColor;
         private UnitValue? _groupSpacing;
 
         private SkipLine _skipLine;
@@ -109,6 +110,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
         public Color? ContentBackgroundColor { get { return _contentBackgroundColor; } set { _contentBackgroundColor = value; } }
         public Color? GroupBorderColor { get { return _groupBorderColor; } set { _groupBorderColor = value; } }
         public Color? GroupBackgroundColor { get { return _groupBackgroundColor; } set { _groupBackgroundColor = value; } }
+        public Color? ColumnBorderColor { get { return _columnBorderColor; } set { _columnBorderColor = value; } }
         public SkipLine SkipLine { get { return _skipLine; } set { _skipLine = value; } }
         public UnitValue RowPadding { get { return _rowPadding ?? _defaultRowPadding; } set { _rowPadding = value; } }
         public UnitValue ColumnPadding { get { return _columnPadding ?? _defaultColumnPadding; } set { _columnPadding = value; } }
@@ -213,21 +215,23 @@ namespace Tharga.Reporter.Engine.Entity.Element
                 {
                     var columnPadding = ColumnPadding.GetXUnitValue(renderData.ElementBounds.Width);
 
-                    var springCount = _columns.Count(x => x.Value.WidthMode == WidthMode.Spring);
-
-                    //Calculate column width
-                    foreach (var column in _columns.Where(x => x.Value.WidthMode != WidthMode.Spring).ToList())
+                    foreach (var column in _columns.Where(x => x.Value.WidthMode == WidthMode.Auto).ToList())
                     {
+                        //Get the size of the columnt title text
                         var stringSize = renderData.Graphics.MeasureString(column.Value.DisplayName, headerFont, XStringFormats.TopLeft);
+                        var wd = UnitValue.Parse((stringSize.Width + (columnPadding * 2)).ToString(CultureInfo.InvariantCulture) + "px");
 
+                        //If there is a fixed width value, start with that.
                         if (column.Value.Width == null)
-                            throw new NullReferenceException(string.Format("Column {0} does not have a width.", column.Value.DisplayName));
+                        {
+                            column.Value.Width = wd;
+                        }
 
-                        if (stringSize.Width > column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width))
-                            column.Value.Width = UnitValue.Parse(stringSize.Width.ToString(CultureInfo.InvariantCulture));
-
-                        if (column.Value.HideValue != null)
-                            column.Value.Hide = true;
+                        //If the column header title is greater than
+                        if (column.Value.Width.Value < wd)
+                        {
+                            column.Value.Width = wd;
+                        }
 
                         foreach (var row in dataTable.Rows)
                         {
@@ -237,9 +241,26 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
                                 var cellData = GetValue(column.Key, rowData.Columns);
                                 stringSize = renderData.Graphics.MeasureString(cellData, lineFont, XStringFormats.TopLeft);
-                                if (stringSize.Width > column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width))
-                                    column.Value.Width = UnitValue.Parse((stringSize.Width + (columnPadding * 2)).ToString(CultureInfo.InvariantCulture) + "px");
+                                wd = UnitValue.Parse((stringSize.Width + (columnPadding * 2)).ToString(CultureInfo.InvariantCulture) + "px");
+                                if (column.Value.Width < wd)
+                                {
+                                    column.Value.Width = wd;
+                                }
+                            }
+                        }
+                    }
 
+                    foreach (var column in _columns.ToList())
+                    {
+                        if (column.Value.HideValue != null)
+                            column.Value.Hide = true;
+
+                        foreach (var row in dataTable.Rows)
+                        {
+                            if (row is DocumentDataTableData)
+                            {
+                                var rowData = row as DocumentDataTableData;
+                                var cellData = GetValue(column.Key, rowData.Columns);
                                 var parsedHideValue = GetValue(column.Value.HideValue, rowData.Columns);
                                 if (parsedHideValue != cellData)
                                     column.Value.Hide = false;
@@ -253,6 +274,14 @@ namespace Tharga.Reporter.Engine.Entity.Element
                     var totalWidth = renderData.ElementBounds.Width;
                     var nonSpringWidth = _columns.Where(x => x.Value.WidthMode != WidthMode.Spring).Sum(x => x.Value.Width != null ? x.Value.Width.Value.GetXUnitValue(totalWidth) : 0);
 
+                    if (nonSpringWidth > totalWidth)
+                    {
+                        //The total width of all columns together are greater than the width available.
+                        //TODO: Figure out a way to handle this.
+                        System.Diagnostics.Debug.WriteLine("The total width of all columns together are greater than the width available.");
+                    }
+
+                    var springCount = _columns.Count(x => x.Value.WidthMode == WidthMode.Spring && !x.Value.Hide);
                     if (springCount > 0)
                     {
                         foreach (var column in _columns.Where(x => x.Value.WidthMode == WidthMode.Spring && !x.Value.Hide).ToList())
@@ -326,7 +355,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
                                 var alignmentJusttification = 0D;
                                 if (column.Value.Align == Alignment.Right)
-                                {
+                                {                                    
                                     var stringSize = renderData.Graphics.MeasureString(cellData, lineFont, XStringFormats.TopLeft);
                                     alignmentJusttification = column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - stringSize.Width - columnPadding;
                                 }
@@ -337,7 +366,16 @@ namespace Tharga.Reporter.Engine.Entity.Element
                                 if (parsedHideValue == cellData)
                                     cellData = string.Empty;
 
-                                renderData.Graphics.DrawString(cellData, lineFont, lineBrush, new XPoint(renderData.ElementBounds.Left + left + alignmentJusttification, renderData.ElementBounds.Top + top), XStringFormats.TopLeft);
+                                //TODO: If the string is too long. Cut the string down.
+                                var calculatedCellData = cellData + "X";
+                                XSize calculatedCellDataSize;
+                                do
+                                {
+                                    calculatedCellData = calculatedCellData.Substring(0, calculatedCellData.Length - 1);
+                                    calculatedCellDataSize = renderData.Graphics.MeasureString(calculatedCellData, lineFont, XStringFormats.TopLeft);
+                                } while (calculatedCellDataSize.Width > column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - columnPadding);
+
+                                renderData.Graphics.DrawString(calculatedCellData, lineFont, lineBrush, new XPoint(renderData.ElementBounds.Left + left + alignmentJusttification, renderData.ElementBounds.Top + top), XStringFormats.TopLeft);
                                 left += column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width);
                             }
 
@@ -370,6 +408,18 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
                             renderData.Graphics.DrawString(groupData, groupFont, lineBrush, topLeft, XStringFormats.TopLeft);
                             pageIndex = 0;
+                        }
+
+                        //Draw column separator lines
+                        if (ColumnBorderColor != null)
+                        {
+                            left = 0;
+                            var borderPen = new XPen(ColumnBorderColor.Value, 0.1); //TODO: Set the thickness of the boarder
+                            foreach (var column in _columns.Where(x => !x.Value.Hide).TakeAllButLast().ToList())
+                            {
+                                left += column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width);
+                                renderData.Graphics.DrawLine(borderPen, renderData.ElementBounds.Left + left, renderData.ElementBounds.Top, renderData.ElementBounds.Left + left, renderData.ElementBounds.Bottom);
+                            }
                         }
 
                         top += lineSize.Height;
@@ -436,6 +486,9 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
             if (_groupBackgroundColor != null)
                 xme.SetAttribute("GroupBackgroundColor", string.Format("{0}{1}{2}", _groupBackgroundColor.Value.R.ToString("X2"), _groupBackgroundColor.Value.G.ToString("X2"), _groupBackgroundColor.Value.B.ToString("X2")));
+
+            if (_columnBorderColor != null)
+                xme.SetAttribute("ColumnBorderColor", string.Format("{0}{1}{2}", _columnBorderColor.Value.R.ToString("X2"), _columnBorderColor.Value.G.ToString("X2"), _columnBorderColor.Value.B.ToString("X2")));
 
             if (_groupBorderColor != null)
                 xme.SetAttribute("GroupBorderColor", string.Format("{0}{1}{2}", _groupBorderColor.Value.R.ToString("X2"), _groupBorderColor.Value.G.ToString("X2"), _groupBorderColor.Value.B.ToString("X2")));
@@ -526,6 +579,10 @@ namespace Tharga.Reporter.Engine.Entity.Element
             if (xmlGroupBackgroundColor != null)
                 table.GroupBackgroundColor = xmlGroupBackgroundColor.Value.ToColor();
 
+            var xmlColumnBorderColor = xme.Attributes["ColumnBorderColor"];
+            if (xmlColumnBorderColor != null)
+                table.ColumnBorderColor = xmlColumnBorderColor.Value.ToColor();
+
             var xmlGroupBorderColor = xme.Attributes["GroupBorderColor"];
             if (xmlGroupBorderColor != null)
                 table.GroupBorderColor = xmlGroupBorderColor.Value.ToColor();
@@ -589,6 +646,24 @@ namespace Tharga.Reporter.Engine.Entity.Element
             }
 
             return table;
+        }
+    }
+
+    internal static class EnumerableExtensions
+    {
+        public static IEnumerable<T> TakeAllButLast<T>(this IEnumerable<T> items)
+        {
+            T buffer = default(T);
+            bool buffered = false;
+
+            foreach (T x in items)
+            {
+                if (buffered)
+                    yield return buffer;
+
+                buffer = x;
+                buffered = true;
+            }
         }
     }
 }

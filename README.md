@@ -126,6 +126,7 @@ Theese are the properties that can be set for a table. The header is the *title*
 - GroupBorderColor
 - GroupBackgroundColor
 - GroupSpacing - Extra height for the grouping line
+- ColumnBorderColor - Color of the separator line between the columns
 - SkipLine - Skips a sertain *height* every number of rows making tables easier to read.
 - RowPadding - Adds extra padding on all rows
 - ColumnPadding - Adds extra padding to the columns

@@ -37,13 +37,28 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
             var documentProperties = new DocumentProperties();
             var sampleData = new DocumentData();
             var documentDataTable = new DocumentDataTable("OrderItems");
+            documentDataTable.AddGroup("ABC");
+            documentDataTable.AddRow(
+                new Dictionary<string, string>
+                    {
+                        { "Description", "Begonina extrapris röda fina" },
+                        { "Details", "ABC123_xAB111x" },
+                        { "DateAdded", "2015-01-01" },
+                        { "AddedBy", "DB" },
+                        { "AmountDescription", "12x24" },
+                        { "Count", "1'000" },
+                        { "NetNormalItemPrice", "1'000.00" },
+                        { "DiscountPercentage", "10" },
+                        { "NetSaleItemPrice", "1'000.00" },
+                        { "NetSaleTotalPrice", "1'000.00" },
+                    });
             documentDataTable.AddRow(
                 new Dictionary<string, string>
                     {
                         { "Description", "A" },
                         { "Details", "" },
                         { "DateAdded", "C" },
-                        { "AddedBy", "D" },
+                        { "AddedBy", "" },
                         { "AmountDescription", "E" },
                         { "Count", "F" },
                         { "NetNormalItemPrice", "G" },
@@ -279,16 +294,42 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
                 {
                     Interval = 3,
                     Height = "2mm"
-                }
+                },
+
+                ColumnPadding = "1mm",
+
+                //GroupBorderColor = Color.Red,
+                //ColumnBorderColor = Color.Green
             };
+
+            //orderItemTable.AddColumn("{Description}", "Specifikation", widthMode: Table.WidthMode.Spring);
+            //orderItemTable.AddColumn("{AddedBy}", "Ref", "10mm", Table.WidthMode.Auto, Table.Alignment.Left, string.Empty);
+            //orderItemTable.AddColumn("{AmountDescription}", "Lådor", "15mm", alignment: Table.Alignment.Right, hideValue: string.Empty);
+            //orderItemTable.AddColumn("{Count}", "Antal", "15mm", Table.WidthMode.Auto, Table.Alignment.Right);
+            //orderItemTable.AddColumn("{NetNormalItemPrice}", "Pris", "15mm", alignment: Table.Alignment.Right, hideValue: "{NetSaleItemPrice}");
+            //orderItemTable.AddColumn("{DiscountPercentage}%", "Rabatt", "15mm", alignment: Table.Alignment.Right, hideValue: "0%");
+            //orderItemTable.AddColumn("{NetSaleItemPrice}", "Säljpris", "20mm", alignment: Table.Alignment.Right);
+            //orderItemTable.AddColumn("{NetSaleTotalPrice}", "Belopp", "20mm", alignment: Table.Alignment.Right);
+
+            //orderItemTable.AddColumn("{Description}", "Specifikation", widthMode: Table.WidthMode.Spring);
+            //orderItemTable.AddColumn("{Details}", "Detalj", "2.5cm");
+            //orderItemTable.AddColumn("{DateAdded}", "Datum", "1cm", Table.WidthMode.Auto, Table.Alignment.Left, string.Empty);
+            //orderItemTable.AddColumn("{AddedBy}", "Ref", "1cm", Table.WidthMode.Auto, Table.Alignment.Left, string.Empty);
+            //orderItemTable.AddColumn("{AmountDescription}", "Lådor", "2cm", alignment: Table.Alignment.Right, hideValue: string.Empty);
+            //orderItemTable.AddColumn("{Count}", "Antal", "2cm", Table.WidthMode.Auto, Table.Alignment.Right);
+            //orderItemTable.AddColumn("{NetNormalItemPrice}", "Pris", "2.5cm", alignment: Table.Alignment.Right, hideValue: "{NetSaleItemPrice}");
+            //orderItemTable.AddColumn("{DiscountPercentage}%", "Rabatt", "2.5cm", alignment: Table.Alignment.Right, hideValue: "0%");
+            //orderItemTable.AddColumn("{NetSaleItemPrice}", "Säljpris", "2cm", alignment: Table.Alignment.Right);
+            //orderItemTable.AddColumn("{NetSaleTotalPrice}", "Belopp", "2cm", alignment: Table.Alignment.Right);
+
             orderItemTable.AddColumn("{Description}", "Specifikation", widthMode: Table.WidthMode.Spring);
-            orderItemTable.AddColumn("{Details}", "Detalj", "2.5cm");
-            orderItemTable.AddColumn("{DateAdded}", "Datum", "1cm", Table.WidthMode.Auto, Table.Alignment.Left, string.Empty);
-            orderItemTable.AddColumn("{AddedBy}", "Ref", "1cm", Table.WidthMode.Auto, Table.Alignment.Left, string.Empty);
-            orderItemTable.AddColumn("{AmountDescription}", "Lådor", "2cm", alignment: Table.Alignment.Right, hideValue: string.Empty);
-            orderItemTable.AddColumn("{Count}", "Antal", "2cm", Table.WidthMode.Auto, Table.Alignment.Right);
-            orderItemTable.AddColumn("{NetNormalItemPrice}", "Pris", "2.5cm", alignment: Table.Alignment.Right, hideValue: "{NetSaleItemPrice}");
-            orderItemTable.AddColumn("{DiscountPercentage}%", "Rabatt", "2.5cm", alignment: Table.Alignment.Right, hideValue: "0%");
+            orderItemTable.AddColumn("{Details}", "Detalj", "1cm", widthMode: Table.WidthMode.Specific, hideValue: string.Empty);
+            orderItemTable.AddColumn("{DateAdded}", "Datum", widthMode: Table.WidthMode.Auto, alignment: Table.Alignment.Left, hideValue: string.Empty);
+            orderItemTable.AddColumn("{AddedBy}", "Ref", widthMode: Table.WidthMode.Auto, alignment: Table.Alignment.Left, hideValue: string.Empty);
+            orderItemTable.AddColumn("{AmountDescription}", "Lådor", alignment: Table.Alignment.Right, hideValue: string.Empty);
+            orderItemTable.AddColumn("{Count}", "Antal", widthMode: Table.WidthMode.Auto, alignment: Table.Alignment.Right);
+            orderItemTable.AddColumn("{NetNormalItemPrice}", "Pris", alignment: Table.Alignment.Right, hideValue: "{NetSaleItemPrice}");
+            orderItemTable.AddColumn("{DiscountPercentage}%", "Rabatt", alignment: Table.Alignment.Right, hideValue: "0%");
             orderItemTable.AddColumn("{NetSaleItemPrice}", "Säljpris", "2cm", alignment: Table.Alignment.Right);
             orderItemTable.AddColumn("{NetSaleTotalPrice}", "Belopp", "2cm", alignment: Table.Alignment.Right);
 
@@ -307,8 +348,8 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
                 HeaderBackgroundColor = backFieldColor,
 
                 ContentFont = new Font { Size = 10, FontName = "Times" },
-                ContentBorderColor = null, //Color.Aqua,
-
+                ContentBorderColor = null,
+                Visibility = PageVisibility.LastPage
             };
 
             paymentTable.AddColumn("{PaymentMethod}", "Betalsätt", widthMode: Table.WidthMode.Spring);
