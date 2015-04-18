@@ -186,6 +186,10 @@ namespace Tharga.Reporter.Engine.Entity.Element
             if (IsNotVisible(renderData))
                 return;
 
+            var pushTextForwardOnPages = 0;
+            if (Visibility == PageVisibility.LastPage && renderData.PageNumberInfo.TotalPages != page)
+                pushTextForwardOnPages = renderData.PageNumberInfo.TotalPages.Value - 1;
+
             if (_pageRowSet == null) throw new InvalidOperationException("PreRendering has not yet been performed.");
 
             renderData.ElementBounds = GetBounds(renderData.ParentBounds);
@@ -325,7 +329,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
                     var defaultRowset = true;
                     var pageRowSet = new PageRowSet { FromRow = 1 };
-                    var index = page - renderData.Section.GetPageOffset();
+                    var index = page - renderData.Section.GetPageOffset() - pushTextForwardOnPages;
                     if (_pageRowSet.Count > index)
                     {
                         try

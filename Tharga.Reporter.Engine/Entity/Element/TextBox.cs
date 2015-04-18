@@ -135,7 +135,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
             var pushTextForwardOnPages = 0;
             if (Visibility == PageVisibility.LastPage && renderData.PageNumberInfo.TotalPages != page)
-                pushTextForwardOnPages = 1;
+                pushTextForwardOnPages = renderData.PageNumberInfo.TotalPages.Value - 1;
 
             if (_pageText == null) throw new InvalidOperationException("Pre-render has not been performed.");
 

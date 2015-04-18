@@ -52,8 +52,10 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
                         { "NetSaleItemPrice", "1'000.00" },
                         { "NetSaleTotalPrice", "1'000.00" },
                     });
-            documentDataTable.AddRow(
-                new Dictionary<string, string>
+            for (var i = 0; i < 60; i++)
+            {
+                documentDataTable.AddRow(
+                    new Dictionary<string, string>
                     {
                         { "Description", "A" },
                         { "Details", "" },
@@ -66,13 +68,14 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
                         { "NetSaleItemPrice", "" },
                         { "NetSaleTotalPrice", "J" },
                     });
+            }
             sampleData.Add(documentDataTable);
 
             var paymentDataTable = new DocumentDataTable("Payments");
             paymentDataTable.AddRow(new Dictionary<string, string>
             {
                 { "PaymentMethod", "A1" },
-                { "PaymentDate", "B1" },
+                { "PaymentDate", "" },
                 { "PaymentSum", "C1" }
             });
 
