@@ -68,6 +68,25 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
                     });
             sampleData.Add(documentDataTable);
 
+            var paymentDataTable = new DocumentDataTable("Payments");
+            paymentDataTable.AddRow(new Dictionary<string, string>
+            {
+                { "PaymentMethod", "A1" },
+                { "PaymentDate", "B1" },
+                { "PaymentSum", "C1" }
+            });
+
+            paymentDataTable.AddRow(new Dictionary<string, string>
+            {
+                { "PaymentMethod", "A2" },
+                { "PaymentDate", "B2" },
+                { "PaymentSum", "C2" }
+            });
+
+            sampleData.Add(paymentDataTable);
+
+            //System.IO.File.WriteAllText(@"C:\a.xml", template.ToXml().OuterXml);
+
             await PdfCommand.RenderPdfAsync(template, documentProperties, sampleData, null, false);
 
             //TODO: Get the xml
@@ -349,11 +368,12 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
 
                 ContentFont = new Font { Size = 10, FontName = "Times" },
                 ContentBorderColor = null,
-                Visibility = PageVisibility.LastPage
+                Visibility = PageVisibility.LastPage,
+                HideTableWhenColumnIsHidden = "{PaymentDate}"  //When this column is hidden, the entire table will be hidden
             };
 
             paymentTable.AddColumn("{PaymentMethod}", "Betalsätt", widthMode: Table.WidthMode.Spring);
-            paymentTable.AddColumn("{PaymentDate}", "Datum", "2cm");
+            paymentTable.AddColumn("{PaymentDate}", "Datum", "2cm", hideValue: string.Empty);
             paymentTable.AddColumn("{PaymentSum}", "Summa", "2cm", Table.WidthMode.Auto, Table.Alignment.Right, string.Empty);
 
             return paymentTable;
@@ -388,7 +408,7 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
 
             var paymentsReferencePoint = new ReferencePoint { Left = "1cm", Top = "163mm" };
             section.Pane.ElementList.Add(paymentsReferencePoint);
-
+            
             paymentsReferencePoint.ElementList.Add(GetPaymentTable(backLineColor, backFieldColor));
 
 

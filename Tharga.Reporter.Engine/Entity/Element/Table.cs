@@ -55,6 +55,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
         internal Dictionary<string, TableColumn> Columns { get { return _columns; } }
         private List<PageRowSet> _pageRowSet;
+        private string _hideTableWhenColumnIsHidden;
 
         public Font HeaderFont
         {
@@ -114,6 +115,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
         public SkipLine SkipLine { get { return _skipLine; } set { _skipLine = value; } }
         public UnitValue RowPadding { get { return _rowPadding ?? _defaultRowPadding; } set { _rowPadding = value; } }
         public UnitValue ColumnPadding { get { return _columnPadding ?? _defaultColumnPadding; } set { _columnPadding = value; } }
+        public string HideTableWhenColumnIsHidden { get { return _hideTableWhenColumnIsHidden; } set { _hideTableWhenColumnIsHidden = value; } }
 
         internal override int PreRender(IRenderData renderData)
         {
@@ -203,8 +205,6 @@ namespace Tharga.Reporter.Engine.Entity.Element
             var headerSize = renderData.Graphics.MeasureString(firstColumn.Value.DisplayName, headerFont, XStringFormats.TopLeft);
             var stdLineSize = renderData.Graphics.MeasureString(firstColumn.Value.DisplayName, lineFont, XStringFormats.TopLeft);
 
-            RenderBorder(renderData.ElementBounds, renderData.Graphics, headerSize);
-
             if (renderData.DebugData != null)
                 renderData.Graphics.DrawString(string.Format("Table: {0}", Name), renderData.DebugData.Font, renderData.DebugData.Brush, renderData.ElementBounds.Center);
 
@@ -268,8 +268,17 @@ namespace Tharga.Reporter.Engine.Entity.Element
                         }
 
                         if (column.Value.Hide)
+                        {
                             column.Value.Width = new UnitValue();
+                            if (HideTableWhenColumnIsHidden == column.Key)
+                            {
+                                //Hide the entire table
+                                return;
+                            }
+                        }
                     }
+
+                    RenderBorder(renderData.ElementBounds, renderData.Graphics, headerSize);
 
                     var totalWidth = renderData.ElementBounds.Width;
                     var nonSpringWidth = _columns.Where(x => x.Value.WidthMode != WidthMode.Spring).Sum(x => x.Value.Width != null ? x.Value.Width.Value.GetXUnitValue(totalWidth) : 0);
@@ -543,6 +552,9 @@ namespace Tharga.Reporter.Engine.Entity.Element
             if (_columnPadding != null)
                 xme.SetAttribute("ColumnPadding", _columnPadding.Value.ToString());
 
+            if (_hideTableWhenColumnIsHidden != null)
+                xme.SetAttribute("HideTableWhenColumnIsHidden", _hideTableWhenColumnIsHidden);
+
             if (_groupSpacing != null)
                 xme.SetAttribute("GroupSpacing", _groupSpacing.Value.ToString());
 
@@ -606,10 +618,14 @@ namespace Tharga.Reporter.Engine.Entity.Element
             var xmlRowPadding = xme.Attributes["RowPadding"];
             if (xmlRowPadding != null)
                 table.RowPadding = xmlRowPadding.Value;
-
+            
             var xmlColumnPadding = xme.Attributes["ColumnPadding"];
             if (xmlColumnPadding != null)
                 table.ColumnPadding = xmlColumnPadding.Value;
+
+            var xmlHideTableWhenColumnIsHidden = xme.Attributes["HideTableWhenColumnIsHidden"];
+            if (xmlHideTableWhenColumnIsHidden != null)
+                table.HideTableWhenColumnIsHidden = xmlHideTableWhenColumnIsHidden.Value;
 
             var xmlGroupSpacing = xme.Attributes["GroupSpacing"];
             if (xmlGroupSpacing != null)

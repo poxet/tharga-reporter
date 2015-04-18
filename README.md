@@ -130,6 +130,7 @@ Theese are the properties that can be set for a table. The header is the *title*
 - SkipLine - Skips a sertain *height* every number of rows making tables easier to read.
 - RowPadding - Adds extra padding on all rows
 - ColumnPadding - Adds extra padding to the columns
+- HideTableWhenColumnIsHidden - The entire table is hidden if the specified column is hidden from the table. (Ex. HideTableWhenColumnIsHidden="{NameOfData}")
 
 ###### Table column
 Columns are a little bit old-school. This code should better be refactored since it does not follow the pattern of everything else here. The way columns are added to a table really does not make any sense...
