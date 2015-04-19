@@ -140,7 +140,6 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
                 TextAlignment = TextBase.Alignment.Right,
                 Width = "100%",
                 Visibility = PageVisibility.WhenMultiplePages
-
             });
         }
 
@@ -307,7 +306,7 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
                 HeaderBackgroundColor = backFieldColor,
 
                 ContentFont = new Font { Size = 10, FontName = "Times" },
-                ContentBorderColor = null, //Color.Aqua,
+                //ContentBorderColor = backLineColor,
 
                 GroupSpacing = "5mm",
                 GroupFont = new Font { Size = 12, Bold = true, FontName = "Times" },
@@ -319,6 +318,9 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
                 },
 
                 ColumnPadding = "1.2mm",
+                ColumnBorderColor = backLineColor ?? Color.Black,
+
+                GroupBackgroundColor = Color.White,
             };
 
             orderItemTable.AddColumn(new TableColumn { Value = "{Description}", Title = "Specifikation", Width = "2cm", WidthMode = Table.WidthMode.Spring });

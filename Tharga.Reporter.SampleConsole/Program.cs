@@ -1,5 +1,6 @@
 ﻿using Tharga.Reporter.ConsoleSample.Commands.ExampleCommands;
 using Tharga.Reporter.ConsoleSample.Commands.PdfCommands;
+using Tharga.Reporter.ConsoleSample.Commands.TestCommands;
 using Tharga.Toolkit.Console;
 using Tharga.Toolkit.Console.Command;
 using Tharga.Toolkit.Console.Command.Base;

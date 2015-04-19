@@ -310,8 +310,12 @@ namespace Tharga.Reporter.Engine.Entity.Element
                         if (column.Align == Alignment.Right)
                         {
                             var stringSize = renderData.Graphics.MeasureString(column.Title, headerFont, XStringFormats.TopLeft);
-                            alignmentJusttification = column.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - stringSize.Width;
-                        }                        
+                            alignmentJusttification = column.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - stringSize.Width - (columnPadding / 2);
+                        }
+                        else
+                        {
+                            alignmentJusttification += columnPadding / 2;
+                        }
 
                         renderData.Graphics.DrawString(column.Title, headerFont, headerBrush, new XPoint(renderData.ElementBounds.Left + left + alignmentJusttification, renderData.ElementBounds.Top), XStringFormats.TopLeft);
                         left += column.Width.Value.GetXUnitValue(renderData.ElementBounds.Width);
@@ -336,6 +340,18 @@ namespace Tharga.Reporter.Engine.Entity.Element
                         catch (Exception exception)
                         {
                             throw new InvalidOperationException(string.Format("_pageRowSet.Count={0}, index={1}", _pageRowSet.Count, index), exception);
+                        }
+                    }
+
+                    //Draw column separator lines
+                    if (ColumnBorderColor != null)
+                    {
+                        left = 0;
+                        var borderPen = new XPen(ColumnBorderColor.Value, 0.1); //TODO: Set the thickness of the boarder
+                        foreach (var column in _columns.Where(x => !x.Value.Hide).TakeAllButLast().ToList())
+                        {
+                            left += column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width);
+                            renderData.Graphics.DrawLine(borderPen, renderData.ElementBounds.Left + left, renderData.ElementBounds.Top, renderData.ElementBounds.Left + left, renderData.ElementBounds.Bottom);
                         }
                     }
 
@@ -366,7 +382,11 @@ namespace Tharga.Reporter.Engine.Entity.Element
                                 if (column.Value.Align == Alignment.Right)
                                 {                                    
                                     var stringSize = renderData.Graphics.MeasureString(cellData, lineFont, XStringFormats.TopLeft);
-                                    alignmentJusttification = column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - stringSize.Width;
+                                    alignmentJusttification = column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - stringSize.Width - (columnPadding / 2);
+                                }
+                                else
+                                {
+                                    alignmentJusttification += columnPadding / 2;
                                 }
 
                                 var parsedHideValue = GetValue(column.Value.HideValue, rowData.Columns);
@@ -393,34 +413,23 @@ namespace Tharga.Reporter.Engine.Entity.Element
                             var groupData = group.Content;
                             var stringSize = renderData.Graphics.MeasureString(groupData, groupFont, XStringFormats.TopLeft);
                             lineSize = stringSize;
-                            var topLeft = new XPoint(renderData.ElementBounds.Left + left, renderData.ElementBounds.Top + top);
+                            var topLeftBox = new XPoint(renderData.ElementBounds.Left + left, renderData.ElementBounds.Top + top);
+                            var topLeftText = new XPoint(renderData.ElementBounds.Left + left + (columnPadding / 2), renderData.ElementBounds.Top + top);
 
                             if (GroupBackgroundColor != null)
                             {
                                 var brush = new XSolidBrush(XColor.FromArgb(GroupBackgroundColor.Value));
-                                var rect = new XRect(topLeft, new XSize(renderData.ElementBounds.Width, stringSize.Height));
+                                var rect = new XRect(topLeftBox, new XSize(renderData.ElementBounds.Width, stringSize.Height));
                                 renderData.Graphics.DrawRectangle(new XPen(XColor.FromArgb(GroupBorderColor ?? GroupBackgroundColor.Value), 0.1), brush, rect);
                             }
                             else if (GroupBorderColor != null)
                             {
-                                var rect = new XRect(topLeft, new XSize(renderData.ElementBounds.Width, stringSize.Height));
+                                var rect = new XRect(topLeftBox, new XSize(renderData.ElementBounds.Width, stringSize.Height));
                                 renderData.Graphics.DrawRectangle(new XPen(XColor.FromArgb(GroupBorderColor.Value), 0.1), rect);
                             }
 
-                            renderData.Graphics.DrawString(groupData, groupFont, lineBrush, topLeft, XStringFormats.TopLeft);
+                            renderData.Graphics.DrawString(groupData, groupFont, lineBrush, topLeftText, XStringFormats.TopLeft);
                             pageIndex = 0;
-                        }
-
-                        //Draw column separator lines
-                        if (ColumnBorderColor != null)
-                        {
-                            left = 0;
-                            var borderPen = new XPen(ColumnBorderColor.Value, 0.1); //TODO: Set the thickness of the boarder
-                            foreach (var column in _columns.Where(x => !x.Value.Hide).TakeAllButLast().ToList())
-                            {
-                                left += column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width);
-                                renderData.Graphics.DrawLine(borderPen, renderData.ElementBounds.Left + left, renderData.ElementBounds.Top, renderData.ElementBounds.Left + left, renderData.ElementBounds.Bottom);
-                            }
                         }
 
                         top += lineSize.Height;
@@ -428,6 +437,18 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
                         pageIndex++;
                     }
+
+                    ////Draw column separator lines
+                    //if (ColumnBorderColor != null)
+                    //{
+                    //    left = 0;
+                    //    var borderPen = new XPen(ColumnBorderColor.Value, 0.1); //TODO: Set the thickness of the boarder
+                    //    foreach (var column in _columns.Where(x => !x.Value.Hide).TakeAllButLast().ToList())
+                    //    {
+                    //        left += column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width);
+                    //        renderData.Graphics.DrawLine(borderPen, renderData.ElementBounds.Left + left, renderData.ElementBounds.Top, renderData.ElementBounds.Left + left, renderData.ElementBounds.Bottom);
+                    //    }
+                    //}
                 }
             }
 
