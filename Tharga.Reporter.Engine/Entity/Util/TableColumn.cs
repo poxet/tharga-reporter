@@ -4,62 +4,82 @@ using Tharga.Reporter.Engine.Entity.Element;
 
 namespace Tharga.Reporter.Engine.Entity.Util
 {
-    internal class TableColumn
+    public class TableColumn
     {
-        public string DisplayName { get; private set; }
-        public UnitValue? Width { get; internal set; }
-        public Table.WidthMode WidthMode { get; private set; }
-        public Table.Alignment Align { get; private set; }
-        public string HideValue { get; private set; }
+        private Table.WidthMode? _widthMode;
+        private string _title;
+        private Table.Alignment? _align;
 
-        internal bool Hide { get; set; }
-
-        //TODO: Have an empty default constructor here as well. And set values later on. As for all other classes.
-        internal TableColumn(string displayName, UnitValue? width, Table.WidthMode widthMode, Table.Alignment align, string hideValue)
+        public TableColumn()
         {
-            if (width == null && widthMode == Table.WidthMode.Specific) throw new InvalidOperationException("When not assigning a specific value for width the width mode cannot be set to specific.").AddData("Column", displayName);
-
-            DisplayName = displayName;
-            Width = width;
-            WidthMode = widthMode;
-            Align = align;
-            HideValue = hideValue;
-
             Hide = false;
         }
+
+        public string Value { get; set; }
+        public string Title { get { return _title ?? string.Empty; } set { _title = value; } }
+        public UnitValue? Width { get; set; }
+        public Table.WidthMode WidthMode { get { return _widthMode ?? Table.WidthMode.Auto; } set { _widthMode = value; } }
+        public Table.Alignment Align { get { return _align ?? Table.Alignment.Left; } set { _align = value; } }
+        public string HideValue { get; set; }
+
+        internal bool Hide { get; set; }
 
         internal XmlElement ToXme()
         {
             var xmd = new XmlDocument();
             var xme = xmd.CreateElement(GetType().ToShortTypeName());
 
-            xme.SetAttribute("DisplayName", DisplayName);
-            xme.SetAttribute("Align", Align.ToString());
+            if (Value != null)
+                xme.SetAttribute("Value", Value);
+
+            if (_title != null)
+                xme.SetAttribute("Title", _title);
+
+            if (_align != null)
+                xme.SetAttribute("Align", _align.ToString());
+            
             if (HideValue != null)
                 xme.SetAttribute("HideValue", HideValue);
+
             if (Width != null)
                 xme.SetAttribute("Width", Width.Value.ToString());
-            xme.SetAttribute("WidthMode", WidthMode.ToString());
+
+            if (_widthMode != null)
+                xme.SetAttribute("WidthMode", _widthMode.ToString());
 
             return xme;
         }
 
         internal static TableColumn Load(XmlElement xme)
         {
-            var displayName = xme.Attributes["DisplayName"].Value;
-            var align = (Table.Alignment)Enum.Parse(typeof(Table.Alignment), xme.Attributes["Align"].Value);
+            var tableColumn = new TableColumn();
 
-            string hideValue = null;
+            if (xme.Attributes["Value"] != null)
+                tableColumn.Value = xme.Attributes["Value"].Value;
+
+            //Just to support reading of old document types, the name of this property has changed to Value. First step is to throw when they are read. Then remove the property entierly.
+            if (xme.Attributes["Key"] != null)
+                tableColumn.Value = xme.Attributes["Key"].Value;
+
+            if (xme.Attributes["Title"] != null) 
+                tableColumn.Title = xme.Attributes["Title"].Value;
+
+            //Just to support reading of old document types, the name of this property has changed to Title. First step is to throw when they are read. Then remove the property entierly.
+            if (xme.Attributes["DisplayName"] != null)
+                tableColumn.Title = xme.Attributes["DisplayName"].Value;
+
+            if (xme.Attributes["Align"] != null) 
+                tableColumn.Align = (Table.Alignment)Enum.Parse(typeof(Table.Alignment), xme.Attributes["Align"].Value);
+
             if (xme.Attributes["HideValue"] != null)
-                hideValue = xme.Attributes["HideValue"].Value;
-
-            UnitValue? width = null;
+                tableColumn.HideValue = xme.Attributes["HideValue"].Value;
+            
             if (xme.Attributes["Width"] != null)
-                width = UnitValue.Parse(xme.Attributes["Width"].Value);
+                tableColumn.Width = UnitValue.Parse(xme.Attributes["Width"].Value);
 
-            var widthMode = (Table.WidthMode)Enum.Parse(typeof(Table.WidthMode), xme.Attributes["WidthMode"].Value);
+            if (xme.Attributes["WidthMode"] != null)
+                tableColumn.WidthMode = (Table.WidthMode)Enum.Parse(typeof(Table.WidthMode), xme.Attributes["WidthMode"].Value);
 
-            var tableColumn = new TableColumn(displayName, width, widthMode, align, hideValue);
             return tableColumn;
         }
     }

@@ -96,9 +96,9 @@ namespace Tharga.Reporter.ConsoleSample.Commands.PdfCommands
                 SkipLine = new SkipLine(),
                 ContentBorderColor = Color.Gray,
             };
-            table.AddColumn("{FirstCol}", "First column", "3cm", Table.WidthMode.Specific);
-            table.AddColumn("${SecondCol}", "Second column", "4cm", Table.WidthMode.Specific, Table.Alignment.Right);
-            table.AddColumn("{ThirdCol}", "Third column", null, Table.WidthMode.Spring);
+            table.AddColumn(new TableColumn { Value = "{FirstCol}", Title = "First column", Width = "3cm", WidthMode = Table.WidthMode.Specific });
+            table.AddColumn(new TableColumn { Value = "${SecondCol}", Title = "Second column", Width = "4cm", WidthMode = Table.WidthMode.Specific, Align = Table.Alignment.Right });
+            table.AddColumn(new TableColumn { Value = "{ThirdCol}", Title = "Third column", WidthMode = Table.WidthMode.Spring });
             return table;
         }
 

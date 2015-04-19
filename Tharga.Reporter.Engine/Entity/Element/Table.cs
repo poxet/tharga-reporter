@@ -135,8 +135,8 @@ namespace Tharga.Reporter.Engine.Entity.Element
             if (firstColumn.Value == null)
                 return 0;
 
-            var headerSize = renderData.Graphics.MeasureString(firstColumn.Value.DisplayName, headerFont, XStringFormats.TopLeft);
-            var stdLineSize = renderData.Graphics.MeasureString(firstColumn.Value.DisplayName, lineFont, XStringFormats.TopLeft);
+            var headerSize = renderData.Graphics.MeasureString(firstColumn.Value.Title, headerFont, XStringFormats.TopLeft);
+            var stdLineSize = renderData.Graphics.MeasureString(firstColumn.Value.Title, lineFont, XStringFormats.TopLeft);
 
             if (renderData.DocumentData != null)
             {
@@ -207,8 +207,8 @@ namespace Tharga.Reporter.Engine.Entity.Element
             var firstColumn = _columns.FirstOrDefault();
             if (firstColumn.Value == null)
                 return;
-            var headerSize = renderData.Graphics.MeasureString(firstColumn.Value.DisplayName, headerFont, XStringFormats.TopLeft);
-            var stdLineSize = renderData.Graphics.MeasureString(firstColumn.Value.DisplayName, lineFont, XStringFormats.TopLeft);
+            var headerSize = renderData.Graphics.MeasureString(firstColumn.Value.Title, headerFont, XStringFormats.TopLeft);
+            var stdLineSize = renderData.Graphics.MeasureString(firstColumn.Value.Title, lineFont, XStringFormats.TopLeft);
 
             if (renderData.DebugData != null)
                 renderData.Graphics.DrawString(string.Format("Table: {0}", Name), renderData.DebugData.Font, renderData.DebugData.Brush, renderData.ElementBounds.Center);
@@ -223,7 +223,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
                     foreach (var column in _columns.Where(x => x.Value.WidthMode == WidthMode.Auto).ToList())
                     {
                         //Get the size of the columnt title text
-                        var stringSize = renderData.Graphics.MeasureString(column.Value.DisplayName, headerFont, XStringFormats.TopLeft);
+                        var stringSize = renderData.Graphics.MeasureString(column.Value.Title, headerFont, XStringFormats.TopLeft);
                         var wd = UnitValue.Parse((stringSize.Width + columnPadding).ToString(CultureInfo.InvariantCulture) + "px");
 
                         //If there is a fixed width value, start with that.
@@ -309,11 +309,11 @@ namespace Tharga.Reporter.Engine.Entity.Element
                         var alignmentJusttification = 0D;
                         if (column.Align == Alignment.Right)
                         {
-                            var stringSize = renderData.Graphics.MeasureString(column.DisplayName, headerFont, XStringFormats.TopLeft);
+                            var stringSize = renderData.Graphics.MeasureString(column.Title, headerFont, XStringFormats.TopLeft);
                             alignmentJusttification = column.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - stringSize.Width;
                         }                        
 
-                        renderData.Graphics.DrawString(column.DisplayName, headerFont, headerBrush, new XPoint(renderData.ElementBounds.Left + left + alignmentJusttification, renderData.ElementBounds.Top), XStringFormats.TopLeft);
+                        renderData.Graphics.DrawString(column.Title, headerFont, headerBrush, new XPoint(renderData.ElementBounds.Left + left + alignmentJusttification, renderData.ElementBounds.Top), XStringFormats.TopLeft);
                         left += column.Width.Value.GetXUnitValue(renderData.ElementBounds.Width);
 
                         if (renderData.DebugData != null)
@@ -507,9 +507,15 @@ namespace Tharga.Reporter.Engine.Entity.Element
             return result;
         }
 
+        [Obsolete("Use function AddColumn that takes tableColumn as a parameter.")]
         public void AddColumn(string displayFormat, string displayName, UnitValue? width = null, WidthMode widthMode = WidthMode.Auto, Alignment alignment = Alignment.Left, string hideValue = null)
         {
-            _columns.Add(displayFormat, new TableColumn(displayName, width, widthMode, alignment, hideValue));
+            _columns.Add(displayFormat, new TableColumn { Title = displayName, Width = width, Align = alignment, HideValue = hideValue, WidthMode = widthMode });
+        }
+
+        public void AddColumn(TableColumn tableColumn)
+        {
+            _columns.Add(tableColumn.Value, tableColumn);
         }
 
         internal override XmlElement ToXme()
@@ -592,8 +598,6 @@ namespace Tharga.Reporter.Engine.Entity.Element
             foreach (var column in Columns)
             {
                 var xmeColumn = column.Value.ToXme();
-
-                xmeColumn.SetAttribute("Key", column.Key);
 
                 var col = columns.OwnerDocument.ImportNode(xmeColumn, true);
                 columns.AppendChild(col);
@@ -679,9 +683,8 @@ namespace Tharga.Reporter.Engine.Entity.Element
                     case "Columns":
                         foreach (XmlElement xmlColumn in child.ChildNodes)
                         {
-                            var name = xmlColumn.Attributes["Key"].Value;
                             var col = TableColumn.Load(xmlColumn);
-                            table.AddColumn(name, col.DisplayName, col.Width, col.WidthMode, col.Align, col.HideValue);
+                            table.AddColumn(col);
                         }
 
                         break;

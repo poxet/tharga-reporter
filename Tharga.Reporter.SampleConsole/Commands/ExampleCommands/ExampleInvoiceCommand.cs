@@ -318,42 +318,19 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
                     Height = "2mm"
                 },
 
-                ColumnPadding = "1mm",
-
-                //GroupBorderColor = Color.Red,
-                //ColumnBorderColor = Color.Green
+                ColumnPadding = "1.2mm",
             };
 
-            //orderItemTable.AddColumn("{Description}", "Specifikation", widthMode: Table.WidthMode.Spring);
-            //orderItemTable.AddColumn("{AddedBy}", "Ref", "10mm", Table.WidthMode.Auto, Table.Alignment.Left, string.Empty);
-            //orderItemTable.AddColumn("{AmountDescription}", "Lådor", "15mm", alignment: Table.Alignment.Right, hideValue: string.Empty);
-            //orderItemTable.AddColumn("{Count}", "Antal", "15mm", Table.WidthMode.Auto, Table.Alignment.Right);
-            //orderItemTable.AddColumn("{NetNormalItemPrice}", "Pris", "15mm", alignment: Table.Alignment.Right, hideValue: "{NetSaleItemPrice}");
-            //orderItemTable.AddColumn("{DiscountPercentage}%", "Rabatt", "15mm", alignment: Table.Alignment.Right, hideValue: "0%");
-            //orderItemTable.AddColumn("{NetSaleItemPrice}", "Säljpris", "20mm", alignment: Table.Alignment.Right);
-            //orderItemTable.AddColumn("{NetSaleTotalPrice}", "Belopp", "20mm", alignment: Table.Alignment.Right);
-
-            //orderItemTable.AddColumn("{Description}", "Specifikation", widthMode: Table.WidthMode.Spring);
-            //orderItemTable.AddColumn("{Details}", "Detalj", "2.5cm");
-            //orderItemTable.AddColumn("{DateAdded}", "Datum", "1cm", Table.WidthMode.Auto, Table.Alignment.Left, string.Empty);
-            //orderItemTable.AddColumn("{AddedBy}", "Ref", "1cm", Table.WidthMode.Auto, Table.Alignment.Left, string.Empty);
-            //orderItemTable.AddColumn("{AmountDescription}", "Lådor", "2cm", alignment: Table.Alignment.Right, hideValue: string.Empty);
-            //orderItemTable.AddColumn("{Count}", "Antal", "2cm", Table.WidthMode.Auto, Table.Alignment.Right);
-            //orderItemTable.AddColumn("{NetNormalItemPrice}", "Pris", "2.5cm", alignment: Table.Alignment.Right, hideValue: "{NetSaleItemPrice}");
-            //orderItemTable.AddColumn("{DiscountPercentage}%", "Rabatt", "2.5cm", alignment: Table.Alignment.Right, hideValue: "0%");
-            //orderItemTable.AddColumn("{NetSaleItemPrice}", "Säljpris", "2cm", alignment: Table.Alignment.Right);
-            //orderItemTable.AddColumn("{NetSaleTotalPrice}", "Belopp", "2cm", alignment: Table.Alignment.Right);
-
-            orderItemTable.AddColumn("{Description}", "Specifikation", widthMode: Table.WidthMode.Spring);
-            orderItemTable.AddColumn("{Details}", "Detalj", "1cm", widthMode: Table.WidthMode.Specific, hideValue: string.Empty);
-            orderItemTable.AddColumn("{DateAdded}", "Datum", widthMode: Table.WidthMode.Auto, alignment: Table.Alignment.Left, hideValue: string.Empty);
-            orderItemTable.AddColumn("{AddedBy}", "Ref", widthMode: Table.WidthMode.Auto, alignment: Table.Alignment.Left, hideValue: string.Empty);
-            orderItemTable.AddColumn("{AmountDescription}", "Lådor", alignment: Table.Alignment.Right, hideValue: string.Empty);
-            orderItemTable.AddColumn("{Count}", "Antal", widthMode: Table.WidthMode.Auto, alignment: Table.Alignment.Right);
-            orderItemTable.AddColumn("{NetNormalItemPrice}", "Pris", alignment: Table.Alignment.Right, hideValue: "{NetSaleItemPrice}");
-            orderItemTable.AddColumn("{DiscountPercentage}%", "Rabatt", alignment: Table.Alignment.Right, hideValue: "0%");
-            orderItemTable.AddColumn("{NetSaleItemPrice}", "Säljpris", "2cm", alignment: Table.Alignment.Right);
-            orderItemTable.AddColumn("{NetSaleTotalPrice}", "Belopp", "2cm", alignment: Table.Alignment.Right);
+            orderItemTable.AddColumn(new TableColumn { Value = "{Description}", Title = "Specifikation", Width = "2cm", WidthMode = Table.WidthMode.Spring });
+            orderItemTable.AddColumn(new TableColumn { Value = "{Details}", Title = "Detalj", HideValue = string.Empty });
+            orderItemTable.AddColumn(new TableColumn { Value = "{DateAdded}", Title = "Datum", Width = "1cm", HideValue = string.Empty });
+            orderItemTable.AddColumn(new TableColumn { Value = "{AddedBy}", Title = "Ref", Width = "1cm", HideValue = string.Empty });
+            orderItemTable.AddColumn(new TableColumn { Value = "{AmountDescription}", Title = "Lådor", Align = Table.Alignment.Right, HideValue = string.Empty });
+            orderItemTable.AddColumn(new TableColumn { Value = "{Count}", Title = "Antal", Align = Table.Alignment.Right });
+            orderItemTable.AddColumn(new TableColumn { Value = "{NetNormalItemPrice}", Title = "Pris", Align = Table.Alignment.Right, HideValue = "{NetSaleItemPrice}" });
+            orderItemTable.AddColumn(new TableColumn { Value = "{DiscountPercentage}%", Title = "Rabatt", Width = "1cm", Align = Table.Alignment.Right, HideValue = "0%" });
+            orderItemTable.AddColumn(new TableColumn { Value = "{NetSaleItemPrice}", Title = "Säljpris", Width = "2cm", Align = Table.Alignment.Right });
+            orderItemTable.AddColumn(new TableColumn { Value = "{NetSaleTotalPrice}", Title = "Belopp", Width = "2cm", Align = Table.Alignment.Right });
 
             return orderItemTable;
         }
@@ -372,12 +349,12 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
                 ContentFont = new Font { Size = 10, FontName = "Times" },
                 ContentBorderColor = null,
                 Visibility = PageVisibility.LastPage,
-                HideTableWhenColumnIsHidden = "{PaymentDate}"  //When this column is hidden, the entire table will be hidden
+                HideTableWhenColumnIsHidden = "{PaymentDate}" //When this column is hidden, the entire table will be hidden
             };
 
-            paymentTable.AddColumn("{PaymentMethod}", "Betalsätt", widthMode: Table.WidthMode.Spring);
-            paymentTable.AddColumn("{PaymentDate}", "Datum", "2cm", hideValue: string.Empty);
-            paymentTable.AddColumn("{PaymentSum}", "Summa", "2cm", Table.WidthMode.Auto, Table.Alignment.Right, string.Empty);
+            paymentTable.AddColumn(new TableColumn { Value = "{PaymentMethod}", Title = "Betalsätt", WidthMode = Table.WidthMode.Spring });
+            paymentTable.AddColumn(new TableColumn { Value = "{PaymentDate}", Title = "Datum", Width = "2cm", HideValue = string.Empty });
+            paymentTable.AddColumn(new TableColumn { Value = "{PaymentSum}", Title = "Summa", Width = "2cm", WidthMode = Table.WidthMode.Auto, Align = Table.Alignment.Right, HideValue = string.Empty });
 
             return paymentTable;
         }

@@ -129,20 +129,20 @@ Theese are the properties that can be set for a table. The header is the *title*
 - ColumnBorderColor - Color of the separator line between the columns
 - SkipLine - Skips a sertain *height* every number of rows making tables easier to read.
 - RowPadding - Adds extra padding on all rows
-- ColumnPadding - Adds extra padding to the columns
+- ColumnPadding - Adds extra padding to the columns on the side where the text is expanding. (To the right when left aligned and to the left when right aligned)
 - HideTableWhenColumnIsHidden - The entire table is hidden if the specified column is hidden from the table. (Ex. HideTableWhenColumnIsHidden="{NameOfData}")
 
 ###### Table column
 Columns are a little bit old-school. This code should better be refactored since it does not follow the pattern of everything else here. The way columns are added to a table really does not make any sense...
-- DisplayName - The text that appears in the header for the column.
+- Title - The text that appears in the header for the column.
+- Value - The value that appears in *cells*. Use the *data* pattern when adding to this table (ie. "{NameOfData}").
 - Width - Width of the column. If left out is is calculated depending on the *WidthMode*.
-- WidthMode - Can be set to *Specific* (the Width has to be set), *Auto* (Automatically calculated in some magic way) and *Spring* (There can be only one in each table. It takes up as much space as it can.)
+- WidthMode - Can be set to *Specific* (the Width has to be set), *Auto* (Calculated so that the largest value will fit, Width is used as minimum width) and *Spring* (It takes up as much space as it can, Width is used as minimum width)
 - Align - Can be set to *Left* or *Right* and affects data and header in the same way.
 - HideValue - Value that if rendered empty, collapses the entire column from the table.
 
-Now, where is the data for the *cells* you might wonder. Me too when I wrote this document. It so happens that there is an extra property tha cannot be seen here. It only exists when adding the column to the table.
-There is a function called *AddColumn* on the table object. The first parameter of this function is the text that will be used on all *cells*. Use the *data* pattern when adding to this table (ie. "{NameOfData}").
-*This should be rewritten so that a table column is created separatley with all its properties and added to the table. This is how all the other elements work.*
+If there is text that dows not fit the width of the column, it is trunkated so that it fits. The truncation is done from the right part of the string until the text fits.
+If the total width of all columns is greater than the table width, all columns are decreased proportionally so that they fit the table.
 
 ###### Table data
 I was going to refer to the *Data* section of this document, but since the data of the table so essensial, I decided to put it here. However, you need an understanding of how data works to fully understand this. So it is not a bad idea to read about the *data* section first anyway.

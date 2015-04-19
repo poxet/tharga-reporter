@@ -3,6 +3,7 @@ using NUnit.Framework;
 using PdfSharp.Drawing;
 using Tharga.Reporter.Engine.Entity;
 using Tharga.Reporter.Engine.Entity.Element;
+using Tharga.Reporter.Engine.Entity.Util;
 using Tharga.Reporter.Engine.Interface;
 
 namespace Tharga.Reporter.Tests.Rendering
@@ -19,8 +20,8 @@ namespace Tharga.Reporter.Tests.Rendering
         protected override void Arrange()
         {
             _table = new Table();
-            _table.AddColumn("A1", "A2");
-            _table.AddColumn("B1", "B2");
+            _table.AddColumn(new TableColumn { Value = "A1", Title = "A2" });
+            _table.AddColumn(new TableColumn { Value = "B1", Title = "B2" });
 
             _documentData = new DocumentData();
             _documentData.Add("A1", "Data_A1");

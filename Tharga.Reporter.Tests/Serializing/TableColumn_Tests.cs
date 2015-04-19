@@ -11,7 +11,7 @@ namespace Tharga.Reporter.Test
         public void Default_Table()
         {
             //Arrange
-            var table = new TableColumn("A", "2cm", Table.WidthMode.Specific, Table.Alignment.Left, "***");
+            var table = new TableColumn { Title = "A", Width = "2cm", WidthMode = Table.WidthMode.Specific, Align = Table.Alignment.Left, HideValue = "***" };
             var xme = table.ToXme();
 
             //Act
@@ -20,7 +20,7 @@ namespace Tharga.Reporter.Test
             //Assert
             Assert.AreEqual(table.Width, otherLine.Width);
             Assert.AreEqual(table.Align, otherLine.Align);
-            Assert.AreEqual(table.DisplayName, otherLine.DisplayName);
+            Assert.AreEqual(table.Title, otherLine.Title);
             Assert.AreEqual(table.Hide, otherLine.Hide);
             Assert.AreEqual(table.HideValue, otherLine.HideValue);
             Assert.AreEqual(table.WidthMode, otherLine.WidthMode);
