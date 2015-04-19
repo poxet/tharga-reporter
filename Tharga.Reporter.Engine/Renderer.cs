@@ -274,7 +274,7 @@ namespace Tharga.Reporter.Engine
                 if (section.Header != null)
                 {
                     if (Math.Abs(headerHeight) < 0.0001 && section.Header.ElementList.Any())
-                        throw new InvalidOperationException("No height for the header has been set.");
+                        throw new InvalidOperationException("No height for the header has been set, but there are elements there.").AddData("ElementCount", section.Header.ElementList.Count);
 
                     var bounds = new XRect(sectionBounds.Left, sectionBounds.Top, sectionBounds.Width, headerHeight);
                     var renderDataHeader = new RenderData(gfx, bounds, section, _documentData, pageNumberInfo, _debugData, includeBackgroundObjects, _documentProperties);
@@ -289,8 +289,8 @@ namespace Tharga.Reporter.Engine
                 //Footer
                 if (section.Footer != null)
                 {
-                    if (Math.Abs(footerHeight) < 0.0001 && section.Header.ElementList.Any())
-                        throw new InvalidOperationException("No height for the footer has been set.");
+                    if (Math.Abs(footerHeight) < 0.0001 && section.Footer.ElementList.Any())
+                        throw new InvalidOperationException("No height for the footer has been set, but there are elements there.").AddData("ElementCount", section.Footer.ElementList.Count);
 
                     var bounds = new XRect(sectionBounds.Left, sectionBounds.Bottom - footerHeight, sectionBounds.Width, footerHeight);
                     var renderDataFooter = new RenderData(gfx, bounds, section, _documentData, pageNumberInfo, _debugData, includeBackgroundObjects, _documentProperties);
