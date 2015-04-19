@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Odbc;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -287,21 +288,18 @@ namespace Tharga.Reporter.Engine.Entity.Element
                     var totalWidth = renderData.ElementBounds.Width;
                     var nonSpringWidth = _columns.Where(x => x.Value.WidthMode != WidthMode.Spring).Sum(x => x.Value.Width != null ? x.Value.Width.Value.GetXUnitValue(totalWidth) : 0);
 
-                    if (nonSpringWidth > totalWidth)
-                    {
-                        //The total width of all columns together are greater than the width available.
-                        //TODO: Figure out a way to handle this.
-                        System.Diagnostics.Debug.WriteLine("The total width of all columns together are greater than the width available.");
-                    }
-
                     var springCount = _columns.Count(x => x.Value.WidthMode == WidthMode.Spring && !x.Value.Hide);
                     if (springCount > 0)
                     {
                         foreach (var column in _columns.Where(x => x.Value.WidthMode == WidthMode.Spring && !x.Value.Hide).ToList())
                         {
-                            column.Value.Width = UnitValue.Parse(((renderData.ElementBounds.Width - nonSpringWidth) / springCount).ToString(CultureInfo.InvariantCulture));
+                            if (column.Value.Width == null) column.Value.Width = "0";
+                            var calculatedWidth = new UnitValue((renderData.ElementBounds.Width - nonSpringWidth) / springCount, UnitValue.EUnit.Point);
+                            if (calculatedWidth > column.Value.Width) column.Value.Width = calculatedWidth;
                         }
                     }
+
+                    AssureTotalColumnWidth(renderData.ElementBounds.Width);
 
                     //Create header
                     double left = 0;
@@ -380,13 +378,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
                                     cellData = string.Empty;
 
                                 //TODO: If the string is too long. Cut the string down.
-                                var calculatedCellData = cellData + "X";
-                                XSize calculatedCellDataSize;
-                                do
-                                {
-                                    calculatedCellData = calculatedCellData.Substring(0, calculatedCellData.Length - 1);
-                                    calculatedCellDataSize = renderData.Graphics.MeasureString(calculatedCellData, lineFont, XStringFormats.TopLeft);
-                                } while (calculatedCellDataSize.Width > column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - columnPadding);
+                                var calculatedCellData = AssureThatTextFitsInColumn(renderData, cellData, column, columnPadding, lineFont);
 
                                 renderData.Graphics.DrawString(calculatedCellData, lineFont, lineBrush, new XPoint(renderData.ElementBounds.Left + left + alignmentJusttification, renderData.ElementBounds.Top + top), XStringFormats.TopLeft);
                                 left += column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width);
@@ -445,6 +437,40 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
             if (renderData.DebugData != null)
                 renderData.Graphics.DrawRectangle(renderData.DebugData.Pen, renderData.ElementBounds);
+        }
+
+        private void AssureTotalColumnWidth(double tableWidth)
+        {
+            var columnWidth = _columns.Sum(x => x.Value.Width != null ? x.Value.Width.Value.GetXUnitValue(tableWidth) : 0);
+            if (columnWidth > tableWidth)
+            {
+                var totalColumnWidth = _columns.Where(x => !x.Value.Hide).Sum(x => (x.Value.Width ?? "0").GetXUnitValue(tableWidth));
+                var decreaseProportion = tableWidth / totalColumnWidth;
+                foreach (var column in _columns.Where(x => !x.Value.Hide).ToList())
+                {
+                    column.Value.Width = column.Value.Width * decreaseProportion;
+                }
+            }
+        }
+
+        private static string AssureThatTextFitsInColumn(IRenderData renderData, string cellData, KeyValuePair<string, TableColumn> column, double columnPadding, XFont lineFont)
+        {
+            if (string.IsNullOrEmpty(cellData)) return cellData;
+
+            var columnWidth = column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - columnPadding;
+            var originlTextWidth = renderData.Graphics.MeasureString(cellData, lineFont, XStringFormats.TopLeft).Width;
+            if (columnWidth >= originlTextWidth) return cellData;
+
+            var calculatedCellData = cellData;
+            XSize calculatedCellDataSize;
+            do
+            {
+                calculatedCellData = calculatedCellData.Substring(0, calculatedCellData.Length - 1);
+                calculatedCellDataSize = renderData.Graphics.MeasureString(calculatedCellData, lineFont, XStringFormats.TopLeft);
+            } 
+            while (calculatedCellDataSize.Width > columnWidth && calculatedCellData != string.Empty);
+
+            return calculatedCellData;
         }
 
         private void RenderBorder(XRect elementBounds, IGraphics gfx, XSize headerSize)

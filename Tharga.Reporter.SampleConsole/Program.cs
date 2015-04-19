@@ -12,6 +12,7 @@ namespace Tharga.Reporter.ConsoleSample
         {
             var rootCommand = new RootCommand(new ClientConsole());
             rootCommand.RegisterCommand(new ExampleCommands());
+            rootCommand.RegisterCommand(new TestCommands());
             rootCommand.RegisterCommand(new PdfCommand());
             var engine = new CommandEngine(rootCommand);
             engine.Run(args);

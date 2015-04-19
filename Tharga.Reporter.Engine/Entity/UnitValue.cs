@@ -151,6 +151,12 @@ namespace Tharga.Reporter.Engine.Entity
             return new UnitValue(a.GetXUnitValue(0) + b.GetXUnitValue(0), EUnit.Point);
         }
 
+        public static UnitValue operator *(UnitValue a, double b)
+        {
+            var v = a.Value * b;
+            return new UnitValue(v, a.Unit);
+        }
+
         public static bool operator ==(UnitValue a, UnitValue b)
         {
             if (((object)a) == ((object)b)) return true;
