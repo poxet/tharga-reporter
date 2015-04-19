@@ -224,7 +224,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
                     {
                         //Get the size of the columnt title text
                         var stringSize = renderData.Graphics.MeasureString(column.Value.DisplayName, headerFont, XStringFormats.TopLeft);
-                        var wd = UnitValue.Parse((stringSize.Width + (columnPadding * 2)).ToString(CultureInfo.InvariantCulture) + "px");
+                        var wd = UnitValue.Parse((stringSize.Width + columnPadding).ToString(CultureInfo.InvariantCulture) + "px");
 
                         //If there is a fixed width value, start with that.
                         if (column.Value.Width == null)
@@ -246,7 +246,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
                                 var cellData = GetValue(column.Key, rowData.Columns);
                                 stringSize = renderData.Graphics.MeasureString(cellData, lineFont, XStringFormats.TopLeft);
-                                wd = UnitValue.Parse((stringSize.Width + (columnPadding * 2)).ToString(CultureInfo.InvariantCulture) + "px");
+                                wd = UnitValue.Parse((stringSize.Width + columnPadding).ToString(CultureInfo.InvariantCulture) + "px");
                                 if (column.Value.Width < wd)
                                 {
                                     column.Value.Width = wd;
@@ -310,10 +310,8 @@ namespace Tharga.Reporter.Engine.Entity.Element
                         if (column.Align == Alignment.Right)
                         {
                             var stringSize = renderData.Graphics.MeasureString(column.DisplayName, headerFont, XStringFormats.TopLeft);
-                            alignmentJusttification = column.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - stringSize.Width - columnPadding;
-                        }
-                        else
-                            alignmentJusttification += columnPadding;
+                            alignmentJusttification = column.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - stringSize.Width;
+                        }                        
 
                         renderData.Graphics.DrawString(column.DisplayName, headerFont, headerBrush, new XPoint(renderData.ElementBounds.Left + left + alignmentJusttification, renderData.ElementBounds.Top), XStringFormats.TopLeft);
                         left += column.Width.Value.GetXUnitValue(renderData.ElementBounds.Width);
@@ -368,10 +366,8 @@ namespace Tharga.Reporter.Engine.Entity.Element
                                 if (column.Value.Align == Alignment.Right)
                                 {                                    
                                     var stringSize = renderData.Graphics.MeasureString(cellData, lineFont, XStringFormats.TopLeft);
-                                    alignmentJusttification = column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - stringSize.Width - columnPadding;
+                                    alignmentJusttification = column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - stringSize.Width;
                                 }
-                                else
-                                    alignmentJusttification += columnPadding;
 
                                 var parsedHideValue = GetValue(column.Value.HideValue, rowData.Columns);
                                 if (parsedHideValue == cellData)
@@ -459,7 +455,10 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
             var columnWidth = column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - columnPadding;
             var originlTextWidth = renderData.Graphics.MeasureString(cellData, lineFont, XStringFormats.TopLeft).Width;
-            if (columnWidth >= originlTextWidth) return cellData;
+            if (columnWidth - originlTextWidth > -0.0001)
+            {
+                return cellData;
+            }
 
             var calculatedCellData = cellData;
             XSize calculatedCellDataSize;
