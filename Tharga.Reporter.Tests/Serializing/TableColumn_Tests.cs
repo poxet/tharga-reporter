@@ -11,7 +11,7 @@ namespace Tharga.Reporter.Test
         public void Default_Table()
         {
             //Arrange
-            var table = new TableColumn { Title = "A", Width = "2cm", WidthMode = Table.WidthMode.Specific, Align = Table.Alignment.Left, HideValue = "***" };
+            var table = new TableColumn { Value = "A", Title = "A", Width = "2cm", WidthMode = Table.WidthMode.Specific, Align = Table.Alignment.Left, HideValue = "***" };
             var xme = table.ToXme();
 
             //Act

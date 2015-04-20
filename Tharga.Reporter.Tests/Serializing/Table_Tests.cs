@@ -83,7 +83,8 @@ namespace Tharga.Reporter.Tests.Serializing
                 ColumnPadding = UnitValue.Parse("7mm"),
                 RowPadding = UnitValue.Parse("6mm"),
             };
-            table.AddColumn(new TableColumn { Value = "A0", Title = "B", Width = "1cm", Align = Table.Alignment.Right, HideValue = "123", WidthMode = Table.WidthMode.Spring });
+            //table.AddColumn(new TableColumn { Value = "A0", Title = "B", Width = "1cm", Align = Table.Alignment.Right, HideValue = "123", WidthMode = Table.WidthMode.Spring });
+            table.AddColumn("A0", "B", "1cm", alignment: Table.Alignment.Right, hideValue: "123", widthMode: Table.WidthMode.Spring);
             table.AddColumn(new TableColumn { Value = "A2", Title = "B", Width = "1cm", Align = Table.Alignment.Right, HideValue = "123", WidthMode = Table.WidthMode.Spring });
             table.AddColumn(new TableColumn { Value = "A1", Title = "B", Width = "1cm", Align = Table.Alignment.Right, HideValue = "123", WidthMode = Table.WidthMode.Spring });
             var xme = table.ToXme();
@@ -172,7 +173,7 @@ namespace Tharga.Reporter.Tests.Serializing
         {
             //Arrange
             var table1 = new Table { Name = "TableA", Top = "2cm", Height = "5cm" };
-            table1.Columns.Add("ColumnA1", new TableColumn { Title = "Column A", Width = "2cm", WidthMode = Table.WidthMode.Auto, Align = Table.Alignment.Left, HideValue = string.Empty });
+            table1.AddColumn(new TableColumn { Value = "ColumnA1", Title = "Column A", Width = "2cm", WidthMode = Table.WidthMode.Auto, Align = Table.Alignment.Left, HideValue = string.Empty });
             var section = new Section();
             section.Pane.ElementList.Add(table1);
             var template = new Template(section);

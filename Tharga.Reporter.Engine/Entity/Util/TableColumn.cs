@@ -61,6 +61,9 @@ namespace Tharga.Reporter.Engine.Entity.Util
             if (xme.Attributes["Key"] != null)
                 tableColumn.Value = xme.Attributes["Key"].Value;
 
+            if (string.IsNullOrEmpty(tableColumn.Value))
+                throw new InvalidOperationException("The attribute value (or key) is missing in the template document.");
+
             if (xme.Attributes["Title"] != null) 
                 tableColumn.Title = xme.Attributes["Title"].Value;
 

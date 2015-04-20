@@ -531,7 +531,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
         [Obsolete("Use function AddColumn that takes tableColumn as a parameter.")]
         public void AddColumn(string displayFormat, string displayName, UnitValue? width = null, WidthMode widthMode = WidthMode.Auto, Alignment alignment = Alignment.Left, string hideValue = null)
         {
-            _columns.Add(displayFormat, new TableColumn { Title = displayName, Width = width, Align = alignment, HideValue = hideValue, WidthMode = widthMode });
+            _columns.Add(displayFormat, new TableColumn { Value = displayFormat, Title = displayName, Width = width, Align = alignment, HideValue = hideValue, WidthMode = widthMode });
         }
 
         public void AddColumn(TableColumn tableColumn)
