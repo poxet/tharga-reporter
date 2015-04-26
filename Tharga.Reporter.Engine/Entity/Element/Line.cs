@@ -35,7 +35,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
             if (renderData.IncludeBackground || !IsBackground)
             {
                 var borderWidth = UnitValue.Parse(Thickness);
-                var pen = new XPen(XColor.FromArgb(Color), borderWidth.GetXUnitValue(0));
+                var pen = new XPen(XColor.FromArgb(Color), borderWidth.ToXUnit(0));
 
                 if (HorixontalSwap(renderData.ParentBounds))
                     renderData.Graphics.DrawLine(pen, renderData.ElementBounds.Right, renderData.ElementBounds.Top, renderData.ElementBounds.Left, renderData.ElementBounds.Bottom);

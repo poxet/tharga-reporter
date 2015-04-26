@@ -31,7 +31,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
             if (!IsBackground || renderData.IncludeBackground)
             {
-                var pen = new XPen(XColor.FromArgb(BorderColor), BorderWidth.GetXUnitValue(0));
+                var pen = new XPen(XColor.FromArgb(BorderColor), BorderWidth.ToXUnit(0));
 
                 if (BackgroundColor != null)
                 {

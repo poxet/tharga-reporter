@@ -9,6 +9,7 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
         {
             RegisterCommand(new ExampleInvoiceCommand());
             RegisterCommand(new ExampleArticleNoteCommand());
+            RegisterCommand(new ExampleMarginCommand());
         }
     }
 }

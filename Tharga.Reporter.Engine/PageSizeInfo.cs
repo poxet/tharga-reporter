@@ -35,7 +35,7 @@ namespace Tharga.Reporter.Engine
             _pageSize = pageSize;
         }
 
-        public PageSizeInfo(PageSize pageSize)
+        internal PageSizeInfo(PageSize pageSize)
         {
             _pageSize = pageSize;
         }
@@ -57,7 +57,7 @@ namespace Tharga.Reporter.Engine
             {
                 if (_pageSize != null) throw new InvalidOperationException("A named document size has been set. Use PageSize property.");
                 if (_width == null) throw new NullReferenceException("Width value is null.");
-                return _width.Value.GetXUnitValue();
+                return _width.Value.ToXUnit();
             }
         }
 
@@ -67,7 +67,7 @@ namespace Tharga.Reporter.Engine
             {
                 if (_pageSize != null) throw new InvalidOperationException("A named document size has been set. Use PageSize property.");
                 if (_height == null) throw new NullReferenceException("Height value is null.");
-                return _height.Value.GetXUnitValue();
+                return _height.Value.ToXUnit();
             }
         }
     }

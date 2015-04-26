@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Threading.Tasks;
-using Tharga.Reporter.ConsoleSample.Commands.PdfCommands;
 using Tharga.Reporter.ConsoleSample.Extensions;
+using Tharga.Reporter.Engine;
 using Tharga.Reporter.Engine.Entity;
 using Tharga.Reporter.Engine.Entity.Element;
 using Tharga.Reporter.Engine.Entity.Util;
@@ -90,7 +91,12 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
 
             //System.IO.File.WriteAllText(@"C:\a.xml", template.ToXml().OuterXml);
 
-            await PdfCommand.RenderPdfAsync(template, documentProperties, sampleData, null, false);
+            //await PdfCommand.RenderPdfAsync(template, documentProperties, sampleData, null, false);
+
+            var pageSizeInfo = new PageSizeInfo("A4");
+            var renderer = new Renderer(template, sampleData, documentProperties, pageSizeInfo, false);
+            var printerSettings = new PrinterSettings { };
+            renderer.Print(printerSettings, true);
 
             //TODO: Get the xml
             //var xme = template.ToXml();

@@ -143,7 +143,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
                 var dataTable = renderData.DocumentData.GetDataTable(Name);
                 if (dataTable != null)
                 {
-                    var top = headerSize.Height + RowPadding.GetXUnitValue(renderData.ElementBounds.Height);
+                    var top = headerSize.Height + RowPadding.ToXUnit(renderData.ElementBounds.Height);
                     var pageIndex = 1;
                     var firstLineOnPage = 0;
                     for (var i = 0; i < dataTable.Rows.Count; i++)
@@ -152,17 +152,17 @@ namespace Tharga.Reporter.Engine.Entity.Element
                         if (dataTable.Rows[i] is DocumentDataTableData)
                         {
                             if (_skipLine != null && pageIndex % SkipLine.Interval == 0)
-                                top += SkipLine.Height.GetXUnitValue(renderData.ElementBounds.Height);
+                                top += SkipLine.Height.ToXUnit(renderData.ElementBounds.Height);
                         }
                         else if (dataTable.Rows[i] is DocumentDataTableGroup)
                         {
-                            top += GroupSpacing.GetXUnitValue(renderData.ElementBounds.Height);
+                            top += GroupSpacing.ToXUnit(renderData.ElementBounds.Height);
                             lineSize = renderData.Graphics.MeasureString("X", groupFont, XStringFormats.TopLeft);
                             pageIndex = 0;
                         }
 
                         top += lineSize.Height;
-                        top += RowPadding.GetXUnitValue(renderData.ElementBounds.Height);
+                        top += RowPadding.ToXUnit(renderData.ElementBounds.Height);
 
                         pageIndex++;
 
@@ -170,7 +170,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
                         {
                             _pageRowSet.Add(new PageRowSet { FromRow = firstLineOnPage, ToRow = i });
                             firstLineOnPage = i + 1;
-                            top = headerSize.Height + RowPadding.GetXUnitValue(renderData.ElementBounds.Height);
+                            top = headerSize.Height + RowPadding.ToXUnit(renderData.ElementBounds.Height);
                         }
                     }
 
@@ -218,7 +218,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
                 var dataTable = renderData.DocumentData.GetDataTable(Name);
                 if (dataTable != null)
                 {
-                    var columnPadding = ColumnPadding.GetXUnitValue(renderData.ElementBounds.Width);
+                    var columnPadding = ColumnPadding.ToXUnit(renderData.ElementBounds.Width);
 
                     foreach (var column in _columns.Where(x => x.Value.WidthMode == WidthMode.Auto).ToList())
                     {
@@ -286,7 +286,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
                     RenderBorder(renderData.ElementBounds, renderData.Graphics, headerSize);
 
                     var totalWidth = renderData.ElementBounds.Width;
-                    var nonSpringWidth = _columns.Where(x => x.Value.WidthMode != WidthMode.Spring).Sum(x => x.Value.Width != null ? x.Value.Width.Value.GetXUnitValue(totalWidth) : 0);
+                    var nonSpringWidth = _columns.Where(x => x.Value.WidthMode != WidthMode.Spring).Sum(x => x.Value.Width != null ? x.Value.Width.Value.ToXUnit(totalWidth) : 0);
 
                     var springCount = _columns.Count(x => x.Value.WidthMode == WidthMode.Spring && !x.Value.Hide);
                     if (springCount > 0)
@@ -310,7 +310,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
                         if (column.Align == Alignment.Right)
                         {
                             var stringSize = renderData.Graphics.MeasureString(column.Title, headerFont, XStringFormats.TopLeft);
-                            alignmentJusttification = column.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - stringSize.Width - (columnPadding / 2);
+                            alignmentJusttification = column.Width.Value.ToXUnit(renderData.ElementBounds.Width) - stringSize.Width - (columnPadding / 2);
                         }
                         else
                         {
@@ -318,13 +318,13 @@ namespace Tharga.Reporter.Engine.Entity.Element
                         }
 
                         renderData.Graphics.DrawString(column.Title, headerFont, headerBrush, new XPoint(renderData.ElementBounds.Left + left + alignmentJusttification, renderData.ElementBounds.Top), XStringFormats.TopLeft);
-                        left += column.Width.Value.GetXUnitValue(renderData.ElementBounds.Width);
+                        left += column.Width.Value.ToXUnit(renderData.ElementBounds.Width);
 
                         if (renderData.DebugData != null)
                             renderData.Graphics.DrawLine(renderData.DebugData.Pen, renderData.ElementBounds.Left + left, renderData.ElementBounds.Top, renderData.ElementBounds.Left + left, renderData.ElementBounds.Bottom);
                     }
 
-                    var top = headerSize.Height + RowPadding.GetXUnitValue(renderData.ElementBounds.Height);
+                    var top = headerSize.Height + RowPadding.ToXUnit(renderData.ElementBounds.Height);
                     var pageIndex = 1;
 
                     var defaultRowset = true;
@@ -350,7 +350,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
                         var borderPen = new XPen(ColumnBorderColor.Value, 0.1); //TODO: Set the thickness of the boarder
                         foreach (var column in _columns.Where(x => !x.Value.Hide).TakeAllButLast().ToList())
                         {
-                            left += column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width);
+                            left += column.Value.Width.Value.ToXUnit(renderData.ElementBounds.Width);
                             renderData.Graphics.DrawLine(borderPen, renderData.ElementBounds.Left + left, renderData.ElementBounds.Top, renderData.ElementBounds.Left + left, renderData.ElementBounds.Bottom);
                         }
                     }
@@ -382,7 +382,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
                                 if (column.Value.Align == Alignment.Right)
                                 {                                    
                                     var stringSize = renderData.Graphics.MeasureString(cellData, lineFont, XStringFormats.TopLeft);
-                                    alignmentJusttification = column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - stringSize.Width - (columnPadding / 2);
+                                    alignmentJusttification = column.Value.Width.Value.ToXUnit(renderData.ElementBounds.Width) - stringSize.Width - (columnPadding / 2);
                                 }
                                 else
                                 {
@@ -397,18 +397,18 @@ namespace Tharga.Reporter.Engine.Entity.Element
                                 var calculatedCellData = AssureThatTextFitsInColumn(renderData, cellData, column, columnPadding, lineFont);
 
                                 renderData.Graphics.DrawString(calculatedCellData, lineFont, lineBrush, new XPoint(renderData.ElementBounds.Left + left + alignmentJusttification, renderData.ElementBounds.Top + top), XStringFormats.TopLeft);
-                                left += column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width);
+                                left += column.Value.Width.Value.ToXUnit(renderData.ElementBounds.Width);
                             }
 
                             if (_skipLine != null && pageIndex % SkipLine.Interval == 0)
-                                top += SkipLine.Height.GetXUnitValue(renderData.ElementBounds.Height);
+                                top += SkipLine.Height.ToXUnit(renderData.ElementBounds.Height);
                         }
                         else if (row is DocumentDataTableGroup)
                         {
                             var group = row as DocumentDataTableGroup;
 
                             if (pageIndex != 1)
-                                top += GroupSpacing.GetXUnitValue(renderData.ElementBounds.Height);
+                                top += GroupSpacing.ToXUnit(renderData.ElementBounds.Height);
 
                             var groupData = group.Content;
                             var stringSize = renderData.Graphics.MeasureString(groupData, groupFont, XStringFormats.TopLeft);
@@ -433,7 +433,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
                         }
 
                         top += lineSize.Height;
-                        top += RowPadding.GetXUnitValue(renderData.ElementBounds.Height);
+                        top += RowPadding.ToXUnit(renderData.ElementBounds.Height);
 
                         pageIndex++;
                     }
@@ -458,10 +458,10 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
         private void AssureTotalColumnWidth(double tableWidth)
         {
-            var columnWidth = _columns.Sum(x => x.Value.Width != null ? x.Value.Width.Value.GetXUnitValue(tableWidth) : 0);
+            var columnWidth = _columns.Sum(x => x.Value.Width != null ? x.Value.Width.Value.ToXUnit(tableWidth) : 0);
             if (columnWidth > tableWidth)
             {
-                var totalColumnWidth = _columns.Where(x => !x.Value.Hide).Sum(x => (x.Value.Width ?? "0").GetXUnitValue(tableWidth));
+                var totalColumnWidth = _columns.Where(x => !x.Value.Hide).Sum(x => (x.Value.Width ?? "0").ToXUnit(tableWidth));
                 var decreaseProportion = tableWidth / totalColumnWidth;
                 foreach (var column in _columns.Where(x => !x.Value.Hide).ToList())
                 {
@@ -474,7 +474,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
         {
             if (string.IsNullOrEmpty(cellData)) return cellData;
 
-            var columnWidth = column.Value.Width.Value.GetXUnitValue(renderData.ElementBounds.Width) - columnPadding;
+            var columnWidth = column.Value.Width.Value.ToXUnit(renderData.ElementBounds.Width) - columnPadding;
             var originlTextWidth = renderData.Graphics.MeasureString(cellData, lineFont, XStringFormats.TopLeft).Width;
             if (columnWidth - originlTextWidth > -0.0001)
             {

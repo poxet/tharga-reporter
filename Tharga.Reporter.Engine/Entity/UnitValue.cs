@@ -90,12 +90,12 @@ namespace Tharga.Reporter.Engine.Entity
             return string.Format("{0}{1}", Value.ToString("0.####").Replace(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator, "."), Unit.ToShortString());
         }
 
-        internal double GetXUnitValue(XGraphicsUnit type = XGraphicsUnit.Point)
+        internal XUnit ToXUnit(XGraphicsUnit type = XGraphicsUnit.Point)
         {
             return DoGetXUnitValue(null, type);
         }
 
-        internal double GetXUnitValue(double totalValue, XGraphicsUnit type = XGraphicsUnit.Point)
+        internal XUnit ToXUnit(double totalValue, XGraphicsUnit type = XGraphicsUnit.Point)
         {
             return DoGetXUnitValue(totalValue, type);
         }
@@ -138,7 +138,7 @@ namespace Tharga.Reporter.Engine.Entity
 
             if (a.Unit == b.Unit)
                 return new UnitValue(a.Value - b.Value, a.Unit);
-            return new UnitValue(a.GetXUnitValue(0) - b.GetXUnitValue(0), EUnit.Point);
+            return new UnitValue(a.ToXUnit(0) - b.ToXUnit(0), EUnit.Point);
         }
 
         public static UnitValue operator +(UnitValue a, UnitValue b)
@@ -148,7 +148,7 @@ namespace Tharga.Reporter.Engine.Entity
 
             if (a.Unit == b.Unit)
                 return new UnitValue(a.Value + b.Value, a.Unit);
-            return new UnitValue(a.GetXUnitValue(0) + b.GetXUnitValue(0), EUnit.Point);
+            return new UnitValue(a.ToXUnit(0) + b.ToXUnit(0), EUnit.Point);
         }
 
         public static UnitValue operator *(UnitValue a, double b)
@@ -173,22 +173,22 @@ namespace Tharga.Reporter.Engine.Entity
 
         public static bool operator <(UnitValue c1, UnitValue c2)
         {
-            return c1.GetXUnitValue() < c2.GetXUnitValue();
+            return c1.ToXUnit() < c2.ToXUnit();
         }
 
         public static bool operator >(UnitValue c1, UnitValue c2)
         {
-            return c1.GetXUnitValue() > c2.GetXUnitValue();
+            return c1.ToXUnit() > c2.ToXUnit();
         }
 
         public static bool operator <=(UnitValue c1, UnitValue c2)
         {
-            return c1.GetXUnitValue() <= c2.GetXUnitValue();
+            return c1.ToXUnit() <= c2.ToXUnit();
         }
 
         public static bool operator >=(UnitValue c1, UnitValue c2)
         {
-            return c1.GetXUnitValue() >= c2.GetXUnitValue();
+            return c1.ToXUnit() >= c2.ToXUnit();
         }
 
         public static implicit operator string(UnitValue item)

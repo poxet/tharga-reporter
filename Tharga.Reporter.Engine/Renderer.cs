@@ -52,12 +52,12 @@ namespace Tharga.Reporter.Engine
             System.IO.File.WriteAllBytes(fileName, GetPdfBinary(includeBackgroundObjects));
         }
 
-        public byte[] GetPdfBinary(bool includeBackgroundObjects = true)
+        public byte[] GetPdfBinary(bool includeBackgroundObjects = true, bool portrait = true)
         {
-            PreRender(_pageSizeInfo, includeBackgroundObjects);
+            PreRender(_pageSizeInfo, includeBackgroundObjects, portrait);
 
             var pdfDocument = CreatePdfDocument();
-            RenderPdfDocument(pdfDocument, false, _pageSizeInfo, includeBackgroundObjects);
+            RenderPdfDocument(pdfDocument, false, _pageSizeInfo, includeBackgroundObjects, portrait);
 
             var memStream = new System.IO.MemoryStream();
             pdfDocument.Save(memStream);
@@ -69,22 +69,13 @@ namespace Tharga.Reporter.Engine
             _printPageCount = 0;
             _includeBackgroundObjects = includeBackgroundObjects;
 
-            PageSizeInfo pageSizeInfo;
-            try
-            {
-                if (printerSettings.DefaultPageSettings.PaperSize.Kind.ToString() == "Custom")
-                    pageSizeInfo = new PageSizeInfo(new UnitValue(printerSettings.DefaultPageSettings.PaperSize.Width, UnitValue.EUnit.Point), new UnitValue(printerSettings.DefaultPageSettings.PaperSize.Height, UnitValue.EUnit.Point));
-                else
-                    pageSizeInfo = new PageSizeInfo(printerSettings.DefaultPageSettings.PaperSize.Kind.ToString());
-            }
-            catch (ArgumentException)
-            {
-                pageSizeInfo = new PageSizeInfo(new UnitValue(printerSettings.DefaultPageSettings.PaperSize.Width, UnitValue.EUnit.Point), new UnitValue(printerSettings.DefaultPageSettings.PaperSize.Height, UnitValue.EUnit.Point));
-            }
+            var pageSizeInfo = GetPageSizeInfo(printerSettings);
 
-            PreRender(pageSizeInfo, includeBackgroundObjects);
+            var portrait = !printerSettings.DefaultPageSettings.Landscape;
 
-            var doc = GetDocument(false);
+            PreRender(pageSizeInfo, includeBackgroundObjects, portrait);
+
+            var doc = GetDocument(false, portrait);
 
             var docRenderer = new DocumentRenderer(doc);
             docRenderer.PrepareDocument();
@@ -99,23 +90,51 @@ namespace Tharga.Reporter.Engine
             printDocument.Print();
         }
 
-        private void RenderPdfDocument(PdfDocument pdfDocument, bool preRender, PageSizeInfo pageSizeInfo, bool includeBackgroundObjects)
+        private static PageSizeInfo GetPageSizeInfo(PrinterSettings printerSettings)
+        {
+            PageSizeInfo pageSizeInfo;
+            try
+            {
+                if (printerSettings.DefaultPageSettings.PaperSize.Kind.ToString() == "Custom")
+                {
+                    pageSizeInfo = GetDefaultPageSizeInfo(printerSettings);
+                }
+                else
+                {
+                    pageSizeInfo = new PageSizeInfo(printerSettings.DefaultPageSettings.PaperSize.Kind.ToString());
+                }
+            }
+            catch (ArgumentException)
+            {
+                pageSizeInfo = GetDefaultPageSizeInfo(printerSettings);
+            }
+
+            return pageSizeInfo;
+        }
+
+        private static PageSizeInfo GetDefaultPageSizeInfo(PrinterSettings printerSettings)
+        {
+            //return new PageSizeInfo(new UnitValue((printerSettings.DefaultPageSettings.PrintableArea.Width / 96), UnitValue.EUnit.Inch), new UnitValue((printerSettings.DefaultPageSettings.PrintableArea.Height / 96), UnitValue.EUnit.Inch));
+            return new PageSizeInfo(new UnitValue((printerSettings.DefaultPageSettings.PaperSize.Width / 96), UnitValue.EUnit.Inch), new UnitValue((printerSettings.DefaultPageSettings.PaperSize.Height / 96), UnitValue.EUnit.Inch));
+        }
+
+        private void RenderPdfDocument(PdfDocument pdfDocument, bool preRender, PageSizeInfo pageSizeInfo, bool includeBackgroundObjects, bool portrait)
         {
             if (_preRendered && preRender)
                 throw new InvalidOperationException("Prerender has already been performed.");
 
-            var doc = GetDocument(preRender);
+            var doc = GetDocument(preRender, portrait);
 
             var docRenderer = new DocumentRenderer(doc);
             docRenderer.PrepareDocument();
 
             for (var ii = 0; ii < doc.Sections.Count; ii++)
             {
-                var page = AddPage(pdfDocument, pageSizeInfo);
+                var page = AddPage(pdfDocument, pageSizeInfo, portrait);
 
                 var gfx = _graphicsFactory.PrepareGraphics(page, docRenderer, ii);
 
-                DoRenderStuff(gfx, new XRect(0, 0, page.Width, page.Height), preRender, ii, _template.SectionList.Sum(x => x.GetRenderPageCount()), includeBackgroundObjects);
+                DoRenderStuff(gfx, new XRect(0, 0, page.Width, page.Height), preRender, ii, _template.SectionList.Sum(x => x.GetRenderPageCount()), includeBackgroundObjects, new XRect(0, 0, 0, 0));
             }
 
             if (preRender)
@@ -124,7 +143,7 @@ namespace Tharga.Reporter.Engine
             }
         }
 
-        private static PdfPage AddPage(PdfDocument pdfDocument, PageSizeInfo pageSizeInfo)
+        private static PdfPage AddPage(PdfDocument pdfDocument, PageSizeInfo pageSizeInfo, bool portrait)
         {
             var page = pdfDocument.AddPage();
 
@@ -138,8 +157,8 @@ namespace Tharga.Reporter.Engine
                 page.Size = pageSizeInfo.PageSize;
             }
 
-            //TODO: If so, rotate all coordinates on the output
-            //page.Orientation = PageOrientation.Landscape;
+            if (!portrait)
+                page.Rotate = 270;
 
             return page;
         }
@@ -184,7 +203,7 @@ namespace Tharga.Reporter.Engine
             return pdfDocument;
         }
 
-        private void PreRender(PageSizeInfo pageSizeInfo, bool includeBackgroundObjects)
+        private void PreRender(PageSizeInfo pageSizeInfo, bool includeBackgroundObjects, bool portrait)
         {
             //TODO: If prerender with one format (pageSize) and printing with another.
             //or, if template or document data changed between render and pre-render then things will be messed up.
@@ -194,21 +213,51 @@ namespace Tharga.Reporter.Engine
                 if (hasMultiPageElements)
                 {
                     var pdfDocument = CreatePdfDocument();
-                    RenderPdfDocument(pdfDocument, true, pageSizeInfo, includeBackgroundObjects);
+                    RenderPdfDocument(pdfDocument, true, pageSizeInfo, includeBackgroundObjects, portrait);
                 }
             }
         }
 
         private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
         {
+            var page = _printPageCount++;
+            //var section = GetSection(false, page);
+
             var rawSize = GetSize(e);
             var unitSize = GetSize(rawSize);
             var scale = GetScale(unitSize);
 
+            var actualPaperMargin = GetActual(e);
+
             var gfx = XGraphics.FromGraphics(e.Graphics, rawSize, XGraphicsUnit.Point);
             gfx.ScaleTransform(scale);
 
-            DoRenderStuff(new MyGraphics(gfx), new XRect(unitSize), false, _printPageCount++, _template.SectionList.Sum(x => x.GetRenderPageCount()), _includeBackgroundObjects);
+            DoRenderStuff(new MyGraphics(gfx), new XRect(unitSize), false, page, _template.SectionList.Sum(x => x.GetRenderPageCount()), _includeBackgroundObjects, actualPaperMargin);
+        }
+
+        private static XRect GetActual(PrintPageEventArgs e)
+        {
+            var l = e.PageSettings.PrintableArea.Left;
+            var t = e.PageSettings.PrintableArea.Top;
+            var r = e.PageBounds.Width - e.PageSettings.PrintableArea.Width - l;
+            var b = e.PageBounds.Height - e.PageSettings.PrintableArea.Height - t;
+
+            if (e.PageSettings.PrintableArea.Width < e.PageSettings.PrintableArea.Height)
+            {
+                l = e.PageSettings.PrintableArea.Top;
+                t = e.PageSettings.PrintableArea.Left;
+                r = e.PageBounds.Width - e.PageSettings.PrintableArea.Height - l;
+                b = e.PageBounds.Height - e.PageSettings.PrintableArea.Width - t;
+            }
+
+            if (b < 0 || r < 0)
+            {
+                return new XRect();
+            }
+
+            var sz2 = new UnitRectangle((l / 96) + "inch", (t / 96) + "inch", (r / 96) + "inch", (b / 96) + "inch");
+            var actualPaperMargin = sz2.ToXRect();
+            return actualPaperMargin;
         }
 
         private static XSize GetSize(XSize rawSize)
@@ -231,13 +280,22 @@ namespace Tharga.Reporter.Engine
 
         private static XSize GetSize(PrintPageEventArgs e)
         {
-            var w = e.PageBounds.Width;
-            var h = e.PageBounds.Height;
-            var size = new XSize(w, h);
+            //margin.Left.Value.GetXUnitValue(XGraphicsUnit.Millimeter)
+            //If SectionMargin < ActualMargin (on any side), use actual margin only.
+            //If SectionMargin > ActualMargin 
+
+            //No margins, use the maximum printable area of the paper
+            //var w = e.PageSettings.PrintableArea.Width;
+            //var h = e.PageSettings.PrintableArea.Height;
+            //var size = e.PageSettings.Landscape ? new XSize(h, w) : new XSize(w, h);
+
+            //Margins has been defined, use the entire paper
+            var size = new XSize(e.PageBounds.Width, e.PageBounds.Height);
+
             return size;
         }
 
-        private void DoRenderStuff(IGraphics gfx, XRect size, bool preRender, int page, int? totalPages, bool includeBackgroundObjects)
+        private void DoRenderStuff(IGraphics gfx, XRect size, bool preRender, int page, int? totalPages, bool includeBackgroundObjects, XRect actualPaperMargin)
         {
             var postRendering = new List<Action>();
 
@@ -245,7 +303,7 @@ namespace Tharga.Reporter.Engine
 
             var section = GetSection(preRender, page);
 
-            var sectionBounds = new XRect(section.Margin.GetLeft(size.Width), section.Margin.GetTop(size.Height), section.Margin.GetWidht(size.Width), section.Margin.GetHeight(size.Height));
+            var sectionBounds = new XRect(section.Margin.GetLeft(size.Width) - actualPaperMargin.Left, section.Margin.GetTop(size.Height) - actualPaperMargin.Top, section.Margin.GetWidht(size.Width), section.Margin.GetHeight(size.Height));
 
             if (_debugData != null)
             {
@@ -266,8 +324,8 @@ namespace Tharga.Reporter.Engine
                 gfx.DrawLine(_debugData.Pen, 0, sectionBounds.Bottom, size.Width, sectionBounds.Bottom);
             }
 
-            var headerHeight = section.Header.Height.GetXUnitValue(sectionBounds.Height);
-            var footerHeight = section.Footer.Height.GetXUnitValue(sectionBounds.Height);
+            var headerHeight = section.Header.Height.ToXUnit(sectionBounds.Height);
+            var footerHeight = section.Footer.Height.ToXUnit(sectionBounds.Height);
             var paneBounds = new XRect(sectionBounds.Left, sectionBounds.Top + headerHeight, sectionBounds.Width, sectionBounds.Height - headerHeight - footerHeight);
 
             var renderData = new RenderData(gfx, paneBounds, section, _documentData, pageNumberInfo, _debugData, includeBackgroundObjects, _documentProperties);
@@ -356,9 +414,11 @@ namespace Tharga.Reporter.Engine
             return section;
         }
 
-        private Document GetDocument(bool preRender)
+        private Document GetDocument(bool preRender, bool portrait)
         {
             var doc = new Document();
+            if (!portrait)
+                doc.DefaultPageSetup.Orientation = Orientation.Landscape;
 
             foreach (var section in _template.SectionList)
             {
