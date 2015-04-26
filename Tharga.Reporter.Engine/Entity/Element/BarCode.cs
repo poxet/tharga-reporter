@@ -27,9 +27,11 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
             renderData.ElementBounds = bounds;
 
-            if (!IsBackground || renderData.IncludeBackground)
+            var codeText = GetCode(renderData.DocumentData, renderData.PageNumberInfo);
+
+            if ((!IsBackground || renderData.IncludeBackground) && !string.IsNullOrEmpty(codeText))
             {
-                var b = new BarCodeBuilder { SymbologyType = Symbology.Code39Standard, CodeText = GetCode(renderData.DocumentData, renderData.PageNumberInfo) };
+                var b = new BarCodeBuilder { SymbologyType = Symbology.Code39Standard, CodeText = codeText };
                 var memStream = new MemoryStream();
                 b.BarCodeImage.Save(memStream, ImageFormat.Png);
                 var imageData = System.Drawing.Image.FromStream(memStream);

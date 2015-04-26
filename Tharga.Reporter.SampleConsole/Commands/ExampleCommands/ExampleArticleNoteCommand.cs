@@ -31,7 +31,7 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
             };
 
             var section = new Section { Margin = new UnitRectangle { Left = "6mm", Top = "2mm", Bottom = "2mm", Right = "6mm" } };
-            section.Pane.ElementList.Add(new BarCode { Code = "ABC123", Top = "10%", Left = "20%", Width = "75%", Height = "60%" });
+            section.Pane.ElementList.Add(new BarCode { Code = "{BarCode}", Top = "10%", Left = "20%", Width = "75%", Height = "60%" });
             section.Pane.ElementList.Add(image);
             section.Pane.ElementList.Add(new Text { Value = "Begonia", Font = new Font { Size = 18 } });
             section.Pane.ElementList.Add(new Text { Value = "100.00 Kr", Font = new Font { Size = 18 }, TextAlignment = TextBase.Alignment.Right });
@@ -43,14 +43,15 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
             };
 
             var sampleData = new DocumentData();
+            sampleData.Add("BarCode", "A");
 
             var pageSizeInfo = new PageSizeInfo("89mm", "36mm");
 
-            //await PdfCommand.RenderPdfAsync(template, documentProperties, sampleData, pageSizeInfo, false, true);
+            await PdfCommand.RenderPdfAsync(template, documentProperties, sampleData, pageSizeInfo, false, true);
 
-            var renderer = new Renderer(template, sampleData, documentProperties, pageSizeInfo, false);
-            var printerSettings = new PrinterSettings { };
-            renderer.Print(printerSettings, true);
+            //var renderer = new Renderer(template, sampleData, documentProperties, pageSizeInfo, false);
+            //var printerSettings = new PrinterSettings { };
+            //renderer.Print(printerSettings, true);
 
             return true;
         }
