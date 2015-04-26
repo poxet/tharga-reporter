@@ -5,6 +5,7 @@ using System.Linq;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.Rendering;
 using MigraDoc.Rendering.Printing;
+using PdfSharp;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using Tharga.Reporter.Engine.Entity;
@@ -12,7 +13,6 @@ using Tharga.Reporter.Engine.Entity.Element;
 using Tharga.Reporter.Engine.Entity.Util;
 using Tharga.Reporter.Engine.Interface;
 using Section = Tharga.Reporter.Engine.Entity.Section;
-using PdfSharp;
 
 namespace Tharga.Reporter.Engine
 {
@@ -69,7 +69,18 @@ namespace Tharga.Reporter.Engine
             _printPageCount = 0;
             _includeBackgroundObjects = includeBackgroundObjects;
 
-            var pageSizeInfo = new PageSizeInfo(printerSettings.DefaultPageSettings.PaperSize.Kind.ToString());
+            PageSizeInfo pageSizeInfo;
+            try
+            {
+                if (printerSettings.DefaultPageSettings.PaperSize.Kind.ToString() == "Custom")
+                    pageSizeInfo = new PageSizeInfo(new UnitValue(printerSettings.DefaultPageSettings.PaperSize.Width, UnitValue.EUnit.Point), new UnitValue(printerSettings.DefaultPageSettings.PaperSize.Height, UnitValue.EUnit.Point));
+                else
+                    pageSizeInfo = new PageSizeInfo(printerSettings.DefaultPageSettings.PaperSize.Kind.ToString());
+            }
+            catch (ArgumentException)
+            {
+                pageSizeInfo = new PageSizeInfo(new UnitValue(printerSettings.DefaultPageSettings.PaperSize.Width, UnitValue.EUnit.Point), new UnitValue(printerSettings.DefaultPageSettings.PaperSize.Height, UnitValue.EUnit.Point));
+            }
 
             PreRender(pageSizeInfo, includeBackgroundObjects);
 
@@ -126,6 +137,9 @@ namespace Tharga.Reporter.Engine
             {
                 page.Size = pageSizeInfo.PageSize;
             }
+
+            //TODO: If so, rotate all coordinates on the output
+            //page.Orientation = PageOrientation.Landscape;
 
             return page;
         }

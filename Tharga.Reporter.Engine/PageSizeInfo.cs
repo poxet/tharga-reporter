@@ -1,7 +1,7 @@
+using System;
 using PdfSharp;
 using PdfSharp.Drawing;
 using Tharga.Reporter.Engine.Entity;
-using System;
 
 namespace Tharga.Reporter.Engine
 {
@@ -56,6 +56,7 @@ namespace Tharga.Reporter.Engine
             get
             {
                 if (_pageSize != null) throw new InvalidOperationException("A named document size has been set. Use PageSize property.");
+                if (_width == null) throw new NullReferenceException("Width value is null.");
                 return _width.Value.GetXUnitValue();
             }
         }
@@ -65,6 +66,7 @@ namespace Tharga.Reporter.Engine
             get
             {
                 if (_pageSize != null) throw new InvalidOperationException("A named document size has been set. Use PageSize property.");
+                if (_height == null) throw new NullReferenceException("Height value is null.");
                 return _height.Value.GetXUnitValue();
             }
         }

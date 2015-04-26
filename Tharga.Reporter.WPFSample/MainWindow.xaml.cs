@@ -1,5 +1,6 @@
-﻿using System.Windows;
+﻿using System;
 using System.Drawing.Printing;
+using System.Windows;
 using Tharga.Reporter.Engine;
 using Tharga.Reporter.Engine.Entity;
 using Tharga.Reporter.Engine.Entity.Element;
@@ -7,9 +8,6 @@ using Section = Tharga.Reporter.Engine.Entity.Section;
 
 namespace Tharga.Reporter.WPFSample
 {
-    using System;
-    using System.Printing;
-
     public partial class MainWindow
     {
         public MainWindow()
@@ -19,13 +17,11 @@ namespace Tharga.Reporter.WPFSample
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            var section = new Section { };
+            var section = new Section();
             section.Pane.ElementList.Add(new Text { Value = "My label" });
             var template = new Template(section);
 
-            var documentProperties = new DocumentProperties
-            {
-            };
+            var documentProperties = new DocumentProperties();
 
             var sampleData = new DocumentData();
 
@@ -57,7 +53,7 @@ namespace Tharga.Reporter.WPFSample
                     }
                     catch (ArgumentException)
                     {
-                        pageSizeInfo = new PageSizeInfo(pageMediaSize.Width / 96 + "inch", pageMediaSize.Height / 96 + "inch");
+                        pageSizeInfo = new PageSizeInfo((pageMediaSize.Width / 96) + "inch", (pageMediaSize.Height / 96) + "inch");
                     }
                 }
 
