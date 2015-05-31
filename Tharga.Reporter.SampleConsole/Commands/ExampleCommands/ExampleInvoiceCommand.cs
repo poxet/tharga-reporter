@@ -91,7 +91,7 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
 
             //System.IO.File.WriteAllText(@"C:\a.xml", template.ToXml().OuterXml);
 
-            //await PdfCommand.RenderPdfAsync(template, documentProperties, sampleData, null, false);
+            //await PdfCommand.RenderPrinterAsync(template, documentProperties, sampleData, null, false);
 
             var pageSizeInfo = new PageSizeInfo("A4");
             var renderer = new Renderer(template, sampleData, documentProperties, pageSizeInfo, false);
