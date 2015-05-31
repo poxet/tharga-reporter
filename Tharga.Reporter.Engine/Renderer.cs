@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Printing;
 using System.Linq;
 using MigraDoc.DocumentObjectModel;
@@ -95,13 +96,14 @@ namespace Tharga.Reporter.Engine
             PageSizeInfo pageSizeInfo;
             try
             {
-                if (printerSettings.DefaultPageSettings.PaperSize.Kind.ToString() == "Custom")
+                var paperKind = printerSettings.DefaultPageSettings.PaperSize.Kind;
+                if (paperKind.ToString() == "Custom")
                 {
                     pageSizeInfo = GetDefaultPageSizeInfo(printerSettings);
                 }
                 else
                 {
-                    pageSizeInfo = new PageSizeInfo(printerSettings.DefaultPageSettings.PaperSize.Kind.ToString());
+                    pageSizeInfo = new PageSizeInfo(paperKind.ToString());
                 }
             }
             catch (ArgumentException)
@@ -114,7 +116,6 @@ namespace Tharga.Reporter.Engine
 
         private static PageSizeInfo GetDefaultPageSizeInfo(PrinterSettings printerSettings)
         {
-            //return new PageSizeInfo(new UnitValue((printerSettings.DefaultPageSettings.PrintableArea.Width / 96), UnitValue.EUnit.Inch), new UnitValue((printerSettings.DefaultPageSettings.PrintableArea.Height / 96), UnitValue.EUnit.Inch));
             return new PageSizeInfo(new UnitValue((printerSettings.DefaultPageSettings.PaperSize.Width / 96), UnitValue.EUnit.Inch), new UnitValue((printerSettings.DefaultPageSettings.PaperSize.Height / 96), UnitValue.EUnit.Inch));
         }
 
@@ -221,7 +222,6 @@ namespace Tharga.Reporter.Engine
         private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
         {
             var page = _printPageCount++;
-            //var section = GetSection(false, page);
 
             var rawSize = GetSize(e);
             var unitSize = GetSize(rawSize);
@@ -237,17 +237,19 @@ namespace Tharga.Reporter.Engine
 
         private static XRect GetActual(PrintPageEventArgs e)
         {
-            var l = e.PageSettings.PrintableArea.Left;
-            var t = e.PageSettings.PrintableArea.Top;
-            var r = e.PageBounds.Width - e.PageSettings.PrintableArea.Width - l;
-            var b = e.PageBounds.Height - e.PageSettings.PrintableArea.Height - t;
+            var printableArea = e.PageSettings.PrintableArea;
 
-            if (e.PageSettings.PrintableArea.Width < e.PageSettings.PrintableArea.Height)
+            var l = printableArea.Left;
+            var t = printableArea.Top;
+            var r = e.PageBounds.Width - printableArea.Width - l;
+            var b = e.PageBounds.Height - printableArea.Height - t;
+
+            if (printableArea.Width < printableArea.Height)
             {
-                l = e.PageSettings.PrintableArea.Top;
-                t = e.PageSettings.PrintableArea.Left;
-                r = e.PageBounds.Width - e.PageSettings.PrintableArea.Height - l;
-                b = e.PageBounds.Height - e.PageSettings.PrintableArea.Width - t;
+                l = printableArea.Top;
+                t = printableArea.Left;
+                r = e.PageBounds.Width - printableArea.Height - l;
+                b = e.PageBounds.Height - printableArea.Width - t;
             }
 
             if (b < 0 || r < 0)
