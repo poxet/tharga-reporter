@@ -290,7 +290,7 @@ If you want to change something it is most likely a new type of element or a new
 Since the renderer is the one that knows about sizes of things, it is the one that has to calculate the number of pages. Therefore the first thing done is a pre-rendering that just does the calculation, but it does not output anything. After that the actual rendering is started.
 
 ## Finally
-This tool is used professionaly by several projekts so it works for something. It is not the prettiest code so feel free to clean it up. :)
+This tool is used professionally by several projects so it works for something. It is not the prettiest code so feel free to clean it up. :)
 There are some tests assuring quality and help protecting when refactoring.
 
 The thing I like the least is that the renderer holds state between the pre-rendering and actual rendering. This is fairly hard to change and makes for big impact. I have some ideas on how it could be, but I have not had the time to change it yet.
