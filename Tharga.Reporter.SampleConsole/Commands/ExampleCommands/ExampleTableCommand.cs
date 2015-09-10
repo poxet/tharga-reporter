@@ -37,8 +37,8 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
 
                 SkipLine = new SkipLine
                 {
-                    Height = "0",
-                    Interval = 1,
+                    Height = "5",
+                    Interval = 3,
                     BorderColor = Color.Red
                 }
             };

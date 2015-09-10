@@ -111,6 +111,12 @@ When setting the size of the image it can be adjusted proportionate by setting j
 - Source - The location of the image described as a absolute or relative path (relative to the running application). You can also use a URL to get the image downloaded.
 *There is an issue with loading images from URL. You cannot use the char : in the path. (ie. http://localhost:12345/MyImage.png). Feel free to contribute to fixing this issue. :)*
 
+If you want to provide image data directly using byte[], then you can encode using windows-1252 and provide the image data as a string.
+```
+var dataAsStringToSendToReporter = Encoding.GetEncoding(1252).GetString(imageAsbyteArrayData);
+```
+
+
 ##### Table
 Tables are the most complex object to be rendered. The use of tables is what actually drove this project from the beginning. The layout can be set in many different ways. Columns can be added and data from a data document placed into the cells. Tables will flow over several pages.
 It is possible to hide columns using different directives depending on the data. For intance, if there is no data in a column it can be hidden from the table.
@@ -127,7 +133,7 @@ Theese are the properties that can be set for a table. The header is the *title*
 - GroupBackgroundColor
 - GroupSpacing - Extra height for the grouping line
 - ColumnBorderColor - Color of the separator line between the columns
-- SkipLine - Skips a sertain *height* every number of rows making tables easier to read.
+- SkipLine - Skips a certain *height* every *Interval* of rows making tables easier to read. BorderColor can be set and will create a horizontal line. (Set height to 0 and Interval to 1 to have a line under every row)
 - RowPadding - Adds extra padding on all rows
 - ColumnPadding - Adds extra padding to the columns on the side where the text is expanding. (To the right when left aligned and to the left when right aligned)
 - HideTableWhenColumnIsHidden - The entire table is hidden if the specified column is hidden from the table. (Ex. HideTableWhenColumnIsHidden="{NameOfData}")
