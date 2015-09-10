@@ -46,6 +46,8 @@ namespace Tharga.Reporter.Tests.Serializing
             Assert.AreEqual(table.ContentFontClass, otherLine.ContentFontClass);
             Assert.AreEqual(table.ContentFont.FontName, otherLine.ContentFont.FontName);
             Assert.AreEqual(table.SkipLine, otherLine.SkipLine);
+            //This is throwing an exception due to the skipline being null
+            //Assert.AreEqual(table.SkipLine.BorderColor, otherLine.SkipLine.BorderColor);
             Assert.AreEqual(table.ColumnPadding, otherLine.ColumnPadding);
             Assert.AreEqual(table.RowPadding, otherLine.RowPadding);
             Assert.AreEqual(table.ToString(), otherLine.ToString());
@@ -79,7 +81,7 @@ namespace Tharga.Reporter.Tests.Serializing
                 GroupSpacing = "5mm",
                 GroupFont = new Font { Bold = true, Color = Color.Red, FontName = "Times", Size = 12, },
 
-                SkipLine = new SkipLine { Interval = 5, Height = "8mm" },
+                SkipLine = new SkipLine { Interval = 5, Height = "8mm", BorderColor = Color.Red},
                 ColumnPadding = UnitValue.Parse("7mm"),
                 RowPadding = UnitValue.Parse("6mm"),
             };
@@ -120,6 +122,7 @@ namespace Tharga.Reporter.Tests.Serializing
 
             Assert.AreEqual(table.SkipLine.Interval, otherLine.SkipLine.Interval);
             Assert.AreEqual(table.SkipLine.Height, otherLine.SkipLine.Height);
+            Assert.AreEqual(table.SkipLine.BorderColor.Value.ToArgb(), otherLine.SkipLine.BorderColor.Value.ToArgb());
             Assert.AreEqual(table.ColumnPadding, otherLine.ColumnPadding);
             Assert.AreEqual(table.RowPadding, otherLine.RowPadding);
             Assert.AreEqual(table.ToString(), otherLine.ToString());

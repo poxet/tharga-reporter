@@ -406,7 +406,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
                                 if (SkipLine.BorderColor != null)
                                 {
-                                    renderData.Graphics.DrawLine(new XPen(XColor.FromArgb(SkipLine.BorderColor), 0.1), renderData.ElementBounds.Left, renderData.ElementBounds.Top + top + lineSize.Height + skipLineHeight / 2, renderData.ElementBounds.Right, renderData.ElementBounds.Top + top + lineSize.Height + skipLineHeight / 2);
+                                    renderData.Graphics.DrawLine(new XPen(XColor.FromArgb((Color)SkipLine.BorderColor), 0.1), renderData.ElementBounds.Left, renderData.ElementBounds.Top + top + lineSize.Height + skipLineHeight / 2, renderData.ElementBounds.Right, renderData.ElementBounds.Top + top + lineSize.Height + skipLineHeight / 2);
                                 }
 
                                 top += skipLineHeight;

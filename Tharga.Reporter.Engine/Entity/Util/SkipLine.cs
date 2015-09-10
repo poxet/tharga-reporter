@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Globalization;
 using System.Xml;
+using Tharga.Reporter.Engine.Entity.Element;
 
 namespace Tharga.Reporter.Engine.Entity.Util
 {
@@ -9,6 +10,7 @@ namespace Tharga.Reporter.Engine.Entity.Util
     {
         private int _interval = 3;
         private UnitValue? _height;
+        private Color? _borderColor;
 
         public int Interval
         {
@@ -26,7 +28,7 @@ namespace Tharga.Reporter.Engine.Entity.Util
             set { _height = value; }
         }
 
-        public Color BorderColor { get; set; }
+        public Color? BorderColor { get { return _borderColor; } set { _borderColor = value; } }
 
         public XmlNode ToXme()
         {
@@ -37,6 +39,10 @@ namespace Tharga.Reporter.Engine.Entity.Util
 
             if (_height != null)
                 xme.SetAttribute("Height", Height.ToString());
+
+
+            if (_borderColor != null)
+                xme.SetAttribute("BorderColor", string.Format("{0}{1}{2}", _borderColor.Value.R.ToString("X2"), _borderColor.Value.G.ToString("X2"), _borderColor.Value.B.ToString("X2")));
 
             return xme;
         }
@@ -52,6 +58,10 @@ namespace Tharga.Reporter.Engine.Entity.Util
             var xmlHeight = xme.Attributes["Height"];
             if (xmlHeight != null)
                 skipLine.Height = xmlHeight.Value;
+            
+            var xmlBorderColor = xme.Attributes["BorderColor"];
+            if (xmlBorderColor != null)
+                skipLine.BorderColor = xmlBorderColor.Value.ToColor();
 
             return skipLine;
         }
