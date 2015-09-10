@@ -31,7 +31,16 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
                 
                 HeaderBorderColor = Color.Blue,
                 ColumnBorderColor = Color.Green,
-                ContentBorderColor = Color.DeepPink
+                ContentBorderColor = Color.DeepPink,
+                GroupBorderColor = Color.Chocolate,
+                //TODO: Suggestion for new property.
+                //RowBorderColor = Color.Black,
+
+                SkipLine = new SkipLine
+                {
+                    Height = "5",
+                    Interval = 3
+                }
             };
             table.AddColumn(new TableColumn { Title = "First", Value = "{A1}" });
             table.AddColumn(new TableColumn { Title = "Second", Value = "{A2}" });
@@ -42,26 +51,12 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
 
             var sampleData = new DocumentData();
             var documentDataTable = new DocumentDataTable("A");
-            documentDataTable.AddRow(
-                new Dictionary<string, string>
-                {
-                    { "A1", "Some stuff" },
-                    { "A2", "Some stuff" },
-                });
+            documentDataTable.AddRow( new Dictionary<string, string> { { "A1", "Some stuff" }, { "A2", "Some stuff" }, });
+            documentDataTable.AddRow( new Dictionary<string, string> { { "A1", "Some stuff on the second row" }, { "A2", "Blah" }, });
+            documentDataTable.AddRow( new Dictionary<string, string> { { "A1", "And on the third row" }, { "A2", "blah blah blah" }, });
+            for(var i = 0; i < 10; i++)
+                documentDataTable.AddRow(new Dictionary<string, string> { { "A1", i.ToString() }, { "A2", "hästmos" }, });
 
-            documentDataTable.AddRow(
-                new Dictionary<string, string>
-                {
-                    { "A1", "Some stuff on the second row" },
-                    { "A2", "Blah" },
-                });
-
-            documentDataTable.AddRow(
-                new Dictionary<string, string>
-                {
-                    { "A1", "And on the third row" },
-                    { "A2", "blah blah blah" },
-                });
             sampleData.Add(documentDataTable);
 
             var pageSizeInfo = new PageSizeInfo("A4");
