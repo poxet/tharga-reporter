@@ -52,6 +52,7 @@
     <Compile Include="Commands\ExampleCommands\ExampleCommands.cs" />
     <Compile Include="Commands\ExampleCommands\ExampleArticleNoteCommand.cs" />
     <Compile Include="Commands\ExampleCommands\ExampleMarginCommand.cs" />
+    <Compile Include="Commands\ExampleCommands\ImageCommand.cs" />
     <Compile Include="Commands\PdfCommands\PrinterCommand.cs" />
     <Compile Include="Commands\TestCommands\TestCommands.cs" />
     <Compile Include="Commands\TestCommands\TestFileCommand.cs" />

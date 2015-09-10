@@ -119,33 +119,46 @@ namespace Tharga.Reporter.Engine.Entity.Element
             return imageData;
         }
 
-        private bool WebResourceExists(string imageUrl, out System.Drawing.Image imageData)
+        private bool WebResourceExists(string image, out System.Drawing.Image imageData)
         {
             imageData = null;
 
-            if (string.IsNullOrEmpty(imageUrl))
+            if (string.IsNullOrEmpty(image))
                 return false;
 
-            var localName = imageUrl.Substring(imageUrl.IndexOf(":", StringComparison.Ordinal) + 3).Replace("/", "_").Replace("?", "_").Replace("=", "_").Replace("&", "_");
-            var cacheFileName = string.Format("{0}{1}", Path.GetTempPath(), localName);
-
-            if (!File.Exists(cacheFileName))
+            Uri path;
+            if (Uri.TryCreate(image, UriKind.Absolute, out path))
             {
-                try
+                var localName = image.Substring(image.IndexOf(":", StringComparison.Ordinal) + 3).Replace("/", "_").Replace("?", "_").Replace("=", "_").Replace("&", "_");
+                var cacheFileName = string.Format("{0}{1}", Path.GetTempPath(), localName);
+
+                if (!File.Exists(cacheFileName))
                 {
-                    using (var client = new WebClient())
+                    try
                     {
-                        client.DownloadFile(imageUrl, cacheFileName);
+                        using (var client = new WebClient())
+                        {
+                            client.DownloadFile(image, cacheFileName);
+                        }
+                    }
+                    catch (WebException)
+                    {
+                        File.Delete(cacheFileName);
+                        return false;
                     }
                 }
-                catch (WebException)
+
+                imageData = System.Drawing.Image.FromFile(cacheFileName);   
+            }
+            else
+            {
+                var encoding = Encoding.GetEncoding(1252);
+                var bytes = encoding.GetBytes(image);
+                using (var ms = new MemoryStream(bytes))
                 {
-                    File.Delete(cacheFileName);
-                    return false;
+                    imageData = System.Drawing.Image.FromStream(ms);
                 }
             }
-
-            imageData = System.Drawing.Image.FromFile(cacheFileName);
 
             return true;
         }
