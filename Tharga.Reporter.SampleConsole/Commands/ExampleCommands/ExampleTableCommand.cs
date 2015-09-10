@@ -39,8 +39,7 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
                 {
                     Height = "0",
                     Interval = 1,
-                    //TODO: Set property BorderColor here
-                    //BorderColor = Color.Black
+                    BorderColor = Color.Red
                 }
             };
             table.AddColumn(new TableColumn { Title = "First", Value = "{A1}" });

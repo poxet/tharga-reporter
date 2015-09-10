@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.Globalization;
 using System.Xml;
 
@@ -24,6 +25,8 @@ namespace Tharga.Reporter.Engine.Entity.Util
             get { return _height ?? "10px"; }
             set { _height = value; }
         }
+
+        public Color BorderColor { get; set; }
 
         public XmlNode ToXme()
         {
