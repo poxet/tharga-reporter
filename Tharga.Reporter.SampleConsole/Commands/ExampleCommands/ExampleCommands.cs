@@ -12,6 +12,7 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
             RegisterCommand(new ExampleMarginCommand());
             RegisterCommand(new ExampleImageCommand());
             RegisterCommand(new ExampleTableCommand());
+            RegisterCommand(new ExampleDynamicCommand());
         }
     }
 }

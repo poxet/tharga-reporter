@@ -218,5 +218,10 @@ namespace Tharga.Reporter.Engine.Entity
 
             return referencePoint;
         }
+
+        public ReferencePoint Clone()
+        {
+            return Load(ToXme());
+        }
     }
 }

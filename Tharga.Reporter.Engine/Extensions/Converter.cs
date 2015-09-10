@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using MigraDoc.DocumentObjectModel;
 using Tharga.Reporter.Engine.Entity;
 using Tharga.Reporter.Engine.Entity.Util;
 using Tharga.Reporter.Engine.Interface;

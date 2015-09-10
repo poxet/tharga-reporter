@@ -48,6 +48,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\ExampleCommands\ExampleDynamicCommand.cs" />
     <Compile Include="Commands\ExampleCommands\ExampleInvoiceCommand.cs" />
     <Compile Include="Commands\ExampleCommands\ExampleCommands.cs" />
     <Compile Include="Commands\ExampleCommands\ExampleArticleNoteCommand.cs" />

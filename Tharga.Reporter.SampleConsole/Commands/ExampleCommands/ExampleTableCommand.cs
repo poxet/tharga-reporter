@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Threading.Tasks;
 using Tharga.Reporter.ConsoleSample.Commands.PdfCommands;
 using Tharga.Reporter.Engine;
