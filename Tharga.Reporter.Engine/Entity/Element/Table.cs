@@ -401,7 +401,14 @@ namespace Tharga.Reporter.Engine.Entity.Element
                             }
 
                             if (_skipLine != null && pageIndex % SkipLine.Interval == 0)
-                                top += SkipLine.Height.ToXUnit(renderData.ElementBounds.Height);
+                            {
+                                var skipLineHeight = SkipLine.Height.ToXUnit(renderData.ElementBounds.Height);
+
+                                //TODO: Check property BorderColor here. If it has one, use it.
+                                renderData.Graphics.DrawLine(new XPen(XColor.FromArgb(Color.DeepPink), 0.1), renderData.ElementBounds.Left, renderData.ElementBounds.Top + top + lineSize.Height + skipLineHeight / 2, renderData.ElementBounds.Right, renderData.ElementBounds.Top + top + lineSize.Height + skipLineHeight / 2);
+
+                                top += skipLineHeight;
+                            }
                         }
                         else if (row is DocumentDataTableGroup)
                         {

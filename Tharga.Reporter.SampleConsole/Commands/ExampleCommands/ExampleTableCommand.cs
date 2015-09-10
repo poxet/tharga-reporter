@@ -29,17 +29,18 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
                 Left = "50", 
                 Right = "50", 
                 
-                HeaderBorderColor = Color.Blue,
-                ColumnBorderColor = Color.Green,
-                ContentBorderColor = Color.DeepPink,
-                GroupBorderColor = Color.Chocolate,
-                //TODO: Suggestion for new property.
-                //RowBorderColor = Color.Black,
+                HeaderBackgroundColor = Color.Pink,
+                //HeaderBorderColor = Color.Blue,
+                //ColumnBorderColor = Color.Green,
+                //ContentBorderColor = Color.DeepPink,
+                //GroupBorderColor = Color.Chocolate,
 
                 SkipLine = new SkipLine
                 {
-                    Height = "5",
-                    Interval = 3
+                    Height = "0",
+                    Interval = 1,
+                    //TODO: Set property BorderColor here
+                    //BorderColor = Color.Black
                 }
             };
             table.AddColumn(new TableColumn { Title = "First", Value = "{A1}" });
