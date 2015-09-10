@@ -12,9 +12,9 @@ using Rectangle = Tharga.Reporter.Engine.Entity.Element.Rectangle;
 
 namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
 {
-    public class ImageCommand : ActionCommandBase
+    public class ExampleImageCommand : ActionCommandBase
     {
-        public ImageCommand() 
+        public ExampleImageCommand() 
             : base("image", "Sample that generates a image from URL or byte[].")
         {
         }
@@ -38,9 +38,8 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
 
             //Image from byte[]. Convert to string with Encoding Windows-1252
             var imageAsbyteArrayData = GetImageAsbyteArrayData();
-            var encoding = Encoding.GetEncoding(1252);
-            var dataAsString = encoding.GetString(imageAsbyteArrayData);
-            sampleData.Add("Img2", dataAsString);
+            var dataAsStringToSendToReporter = Encoding.GetEncoding(1252).GetString(imageAsbyteArrayData);
+            sampleData.Add("Img2", dataAsStringToSendToReporter);
 
             var pageSizeInfo = new PageSizeInfo("A4");
 
