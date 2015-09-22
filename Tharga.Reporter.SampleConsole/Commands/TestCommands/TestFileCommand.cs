@@ -22,8 +22,8 @@ namespace Tharga.Reporter.ConsoleSample.Commands.TestCommands
             var index = 0;
             var templateFile = QueryParam<string>("Template File", GetParam(paramList, index++));
             var dataFile = QueryParam<string>("Data File", GetParam(paramList, index++));
-            var debug = QueryParam("Debug", GetParam(paramList, index++), () => new List<KeyValuePair<bool, string>> { new KeyValuePair<bool, string>(true, "Yes"), new KeyValuePair<bool, string>(false, "No") });
-            var output = QueryParam("Output", GetParam(paramList, index++), () => new List<KeyValuePair<output, string>> { new KeyValuePair<output, string>(TestFileCommand.output.pdf, TestFileCommand.output.pdf.ToString()), new KeyValuePair<output, string>(TestFileCommand.output.printer, TestFileCommand.output.printer.ToString()) });
+            var debug = QueryParam("Debug", GetParam(paramList, index++), new List<KeyValuePair<bool, string>> { new KeyValuePair<bool, string>(true, "Yes"), new KeyValuePair<bool, string>(false, "No") });
+            var output = QueryParam("Output", GetParam(paramList, index++), new List<KeyValuePair<output, string>> { new KeyValuePair<output, string>(TestFileCommand.output.pdf, TestFileCommand.output.pdf.ToString()), new KeyValuePair<output, string>(TestFileCommand.output.printer, TestFileCommand.output.printer.ToString()) });
 
             var xmdTemplate = new XmlDocument();
             xmdTemplate.Load(templateFile);
