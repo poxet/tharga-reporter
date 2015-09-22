@@ -78,7 +78,7 @@ namespace Tharga.Reporter.Engine
 
             var pageSizeInfo = GetPageSizeInfo(printerSettings);
 
-            var portrait = false;
+            var portrait = true;
             if (_printerInteractionMode == PrinterInteractionMode.Active)
             {
                 portrait = !printerSettings.DefaultPageSettings.Landscape;
