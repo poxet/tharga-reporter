@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Drawing.Printing;
+using System.IO;
 using System.Linq;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.Rendering;
@@ -9,6 +9,7 @@ using MigraDoc.Rendering.Printing;
 using PdfSharp;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
+using PdfSharp.Pdf.Security;
 using Tharga.Reporter.Engine.Entity;
 using Tharga.Reporter.Engine.Entity.Element;
 using Tharga.Reporter.Engine.Entity.Util;
@@ -17,11 +18,14 @@ using Section = Tharga.Reporter.Engine.Entity.Section;
 
 namespace Tharga.Reporter.Engine
 {
+    public enum PrinterInteractionMode { None, Active }
+
     public class Renderer
     {
         private readonly Template _template;
         private readonly DocumentData _documentData;
         private readonly DocumentProperties _documentProperties;
+        private readonly PrinterInteractionMode _printerInteractionMode;
         private readonly IDebugData _debugData;
         private readonly IGraphicsFactory _graphicsFactory;
         private readonly PageSizeInfo _pageSizeInfo;
@@ -29,28 +33,29 @@ namespace Tharga.Reporter.Engine
         private bool _preRendered;
         private bool _includeBackgroundObjects = true;
 
-        internal Renderer(IGraphicsFactory graphicsFactory, Template template, DocumentData documentData = null, DocumentProperties documentProperties = null, PageSizeInfo pageSizeInfo = null, bool debug = false)
+        internal Renderer(IGraphicsFactory graphicsFactory, Template template, DocumentData documentData = null, DocumentProperties documentProperties = null, PageSizeInfo pageSizeInfo = null, bool debug = false, PrinterInteractionMode printerInteractionMode = PrinterInteractionMode.None)
         {
             _template = template;
             _documentData = documentData;
             _documentProperties = documentProperties;
+            _printerInteractionMode = printerInteractionMode;
             _pageSizeInfo = pageSizeInfo ?? new PageSizeInfo(PageSize.A4);
             if (debug)
                 _debugData = new DebugData();
             _graphicsFactory = graphicsFactory;
         }
 
-        public Renderer(Template template, DocumentData documentData = null, DocumentProperties documentProperties = null, PageSizeInfo pageSizeInfo = null, bool debug = false)
-            : this(new MyGraphicsFactory(), template, documentData, documentProperties, pageSizeInfo, debug)
+        public Renderer(Template template, DocumentData documentData = null, DocumentProperties documentProperties = null, PageSizeInfo pageSizeInfo = null, bool debug = false, PrinterInteractionMode printerInteractionMode = PrinterInteractionMode.None)
+            : this(new MyGraphicsFactory(), template, documentData, documentProperties, pageSizeInfo, debug, printerInteractionMode)
         {
         }
 
         public void CreatePdfFile(string fileName, bool includeBackgroundObjects = true)
         {
-            if (System.IO.File.Exists(fileName))
+            if (File.Exists(fileName))
                 throw new InvalidOperationException("The file already exists.").AddData("fileName", fileName);
 
-            System.IO.File.WriteAllBytes(fileName, GetPdfBinary(includeBackgroundObjects));
+            File.WriteAllBytes(fileName, GetPdfBinary(includeBackgroundObjects));
         }
 
         public byte[] GetPdfBinary(bool includeBackgroundObjects = true, bool portrait = true)
@@ -60,7 +65,7 @@ namespace Tharga.Reporter.Engine
             var pdfDocument = CreatePdfDocument();
             RenderPdfDocument(pdfDocument, false, _pageSizeInfo, includeBackgroundObjects, portrait);
 
-            var memStream = new System.IO.MemoryStream();
+            var memStream = new MemoryStream();
             pdfDocument.Save(memStream);
             return memStream.ToArray();
         }
@@ -72,7 +77,11 @@ namespace Tharga.Reporter.Engine
 
             var pageSizeInfo = GetPageSizeInfo(printerSettings);
 
-            var portrait = !printerSettings.DefaultPageSettings.Landscape;
+            var portrait = false;
+            if (_printerInteractionMode == PrinterInteractionMode.Active)
+            {
+                portrait = !printerSettings.DefaultPageSettings.Landscape;
+            }
 
             PreRender(pageSizeInfo, includeBackgroundObjects, portrait);
 
@@ -85,31 +94,44 @@ namespace Tharga.Reporter.Engine
             printDocument.PrintController = new StandardPrintController();
 
             printDocument.PrintPage += PrintDocument_PrintPage;
-
             printDocument.Renderer = docRenderer;
             printDocument.PrinterSettings = printerSettings;
             printDocument.Print();
         }
 
-        private static PageSizeInfo GetPageSizeInfo(PrinterSettings printerSettings)
+        private PageSizeInfo GetPageSizeInfo(PrinterSettings printerSettings)
         {
             PageSizeInfo pageSizeInfo;
-            try
+
+            switch (_printerInteractionMode)
             {
-                var paperKind = printerSettings.DefaultPageSettings.PaperSize.Kind;
-                if (paperKind.ToString() == "Custom")
-                {
-                    pageSizeInfo = GetDefaultPageSizeInfo(printerSettings);
-                }
-                else
-                {
-                    pageSizeInfo = new PageSizeInfo(paperKind.ToString());
-                }
+                case PrinterInteractionMode.None:
+                    pageSizeInfo = new PageSizeInfo(_pageSizeInfo.PageSize);
+                    break;
+
+                case PrinterInteractionMode.Active:
+                    try
+                    {
+                        var paperKind = printerSettings.DefaultPageSettings.PaperSize.Kind;
+                        if (paperKind.ToString() == "Custom")
+                        {
+                            pageSizeInfo = GetDefaultPageSizeInfo(printerSettings);
+                        }
+                        else
+                        {
+                            pageSizeInfo = new PageSizeInfo(paperKind.ToString());
+                        }
+                    }
+                    catch (ArgumentException)
+                    {
+                        pageSizeInfo = GetDefaultPageSizeInfo(printerSettings);
+                    }
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(string.Format("Unknown printer interaction mode {0}.", _printerInteractionMode));
             }
-            catch (ArgumentException)
-            {
-                pageSizeInfo = GetDefaultPageSizeInfo(printerSettings);
-            }
+
 
             return pageSizeInfo;
         }
@@ -190,7 +212,7 @@ namespace Tharga.Reporter.Engine
             //pdfDocument.ViewerPreferences.
 
             //TODO: Provide security settings
-            pdfDocument.SecuritySettings.DocumentSecurityLevel = PdfSharp.Pdf.Security.PdfDocumentSecurityLevel.Encrypted128Bit;
+            pdfDocument.SecuritySettings.DocumentSecurityLevel = PdfDocumentSecurityLevel.Encrypted128Bit;
             pdfDocument.SecuritySettings.OwnerPassword = "qwerty12";
             pdfDocument.SecuritySettings.PermitAccessibilityExtractContent = false;
             pdfDocument.SecuritySettings.PermitAnnotations = false;
@@ -226,7 +248,6 @@ namespace Tharga.Reporter.Engine
             var rawSize = GetSize(e);
             var unitSize = GetSize(rawSize);
             var scale = GetScale(unitSize);
-
             var actualPaperMargin = GetActual(e);
 
             var gfx = XGraphics.FromGraphics(e.Graphics, rawSize, XGraphicsUnit.Point);
@@ -235,8 +256,13 @@ namespace Tharga.Reporter.Engine
             DoRenderStuff(new MyGraphics(gfx), new XRect(unitSize), false, page, _template.SectionList.Sum(x => x.GetRenderPageCount()), _includeBackgroundObjects, actualPaperMargin);
         }
 
-        private static XRect GetActual(PrintPageEventArgs e)
+        private XRect GetActual(PrintPageEventArgs e)
         {
+            if (_printerInteractionMode == PrinterInteractionMode.None)
+            {
+                return new XRect();
+            }
+
             var printableArea = e.PageSettings.PrintableArea;
 
             var l = printableArea.Left;

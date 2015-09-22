@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Linq;
@@ -93,13 +94,16 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
 
             //await PdfCommand.RenderPrinterAsync(template, documentProperties, sampleData, null, false);
 
+            var sw = new Stopwatch();
+            sw.Start();
+
+            //TODO: Time this function and try to make it as fast as possible
             var pageSizeInfo = new PageSizeInfo("A4");
-            var renderer = new Renderer(template, sampleData, documentProperties, pageSizeInfo, false);
-            var printerSettings = new PrinterSettings { };
+            var renderer = new Renderer(template, sampleData, documentProperties, pageSizeInfo, false, PrinterInteractionMode.None);
+            var printerSettings = new PrinterSettings { PrinterName = "Microsoft XPS Document Writer", PrintFileName = @"C:\temp\a.xps", PrintToFile = true };
             renderer.Print(printerSettings, true);
 
-            //TODO: Get the xml
-            //var xme = template.ToXml();
+            OutputInformation("Total: " + sw.Elapsed.TotalMilliseconds.ToString("00,000.000") + "ms"); //BEFORE: 01 519,796ms
 
             return true;
         }

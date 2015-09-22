@@ -6,7 +6,7 @@ namespace Tharga.Reporter.Engine.Entity
 {
     public class Section
     {
-        private readonly Font _globalDefaultFont = new Font { };
+        private readonly Font _globalDefaultFont = new Font();
 
         private UnitRectangle _margin;
         private string _name;
