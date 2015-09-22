@@ -100,10 +100,10 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
             //TODO: Time this function and try to make it as fast as possible
             var pageSizeInfo = new PageSizeInfo("A4");
             var renderer = new Renderer(template, sampleData, documentProperties, pageSizeInfo, false, PrinterInteractionMode.None);
-            var printerSettings = new PrinterSettings(); // { PrinterName = "Microsoft XPS Document Writer", PrintFileName = @"C:\temp\a.xps", PrintToFile = true };
+            var printerSettings = new PrinterSettings { PrinterName = "Microsoft XPS Document Writer", PrintFileName = @"C:\temp\a.xps", PrintToFile = true };
             renderer.Print(printerSettings, true);
 
-            OutputInformation("Total: " + sw.Elapsed.TotalMilliseconds.ToString("00,000.000") + "ms"); //BEFORE: 01 519,796ms
+            OutputInformation("It took " + sw.Elapsed.TotalSeconds + "s to send to printer."); //BEFORE: 01 519,796ms
 
             return true;
         }
