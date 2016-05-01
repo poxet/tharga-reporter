@@ -1,4 +1,5 @@
 using System;
+using System.Data.SqlTypes;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -80,7 +81,6 @@ namespace Tharga.Reporter.Engine.Entity.Element
                 }
                 else if (WebResourceExists(source, out imageData))
                 {
-                    //return imageData;
                 }
                 else if (!string.IsNullOrEmpty(source))
                 {
@@ -132,34 +132,17 @@ namespace Tharga.Reporter.Engine.Entity.Element
                 Uri path;
                 if (Uri.TryCreate(image, UriKind.Absolute, out path))
                 {
-                    var localName = image.Substring(image.IndexOf(":", StringComparison.Ordinal) + 3).Replace("/", "_").Replace("?", "_").Replace("=", "_").Replace("&", "_");
-                    var cacheFileName = string.Format("{0}{1}", Path.GetTempPath(), localName);
-
-                    if (!File.Exists(cacheFileName))
+                    if (WebResourceByCache(image, ref imageData))
                     {
-                        try
-                        {
-                            using (var client = new WebClient())
-                            {
-                                client.DownloadFile(image, cacheFileName);
-                            }
-                        }
-                        catch (WebException)
-                        {
-                            File.Delete(cacheFileName);
-                            return false;
-                        }
+                        return true;
                     }
 
-                    try
+                    if (WebResourceDirectly(image, ref imageData))
                     {
-                        imageData = System.Drawing.Image.FromFile(cacheFileName);
+                        return true;
                     }
-                    catch (OutOfMemoryException exception)
-                    {
-                        exception.AddData("cacheFileName", cacheFileName);
-                        throw;
-                    }
+
+                    return false;
                 }
                 else
                 {
@@ -169,15 +152,67 @@ namespace Tharga.Reporter.Engine.Entity.Element
                     {
                         imageData = System.Drawing.Image.FromStream(ms);
                     }
+                    return true;
                 }
-
-                return true;
             }
             catch (Exception exception)
             {
                 exception.AddData("image", image);
                 throw;
             }
+        }
+
+        private static bool WebResourceDirectly(string image, ref System.Drawing.Image imageData)
+        {
+            using (var client = new WebClient())
+            {
+                using (var stream = client.OpenRead(image))
+                {
+                    if (stream != null)
+                    {
+                        imageData = System.Drawing.Image.FromStream(stream);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+        }
+
+        private static bool WebResourceByCache(string image, ref System.Drawing.Image imageData)
+        {
+            var localName = image.Substring(image.IndexOf(":", StringComparison.Ordinal) + 3).Replace("/", "_").Replace("?", "_").Replace("=", "_").Replace("&", "_").Replace(":", "_");
+            var cacheFileName = string.Format("{0}{1}", Path.GetTempPath(), localName);
+
+            if (!File.Exists(cacheFileName))
+            {
+                try
+                {
+                    using (var client = new WebClient())
+                    {
+                        client.DownloadFile(image, cacheFileName);
+                    }
+                }
+                catch (WebException)
+                {
+                    if (File.Exists(cacheFileName))
+                    {
+                        File.Delete(cacheFileName);
+                    }
+                    return false;
+                }
+            }
+
+            try
+            {
+                imageData = System.Drawing.Image.FromFile(cacheFileName);
+            }
+            catch (OutOfMemoryException exception)
+            {
+                exception.AddData("cacheFileName", cacheFileName);
+                throw;
+            }
+
+            return true;
         }
 
         internal override XmlElement ToXme()
