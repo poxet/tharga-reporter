@@ -110,6 +110,10 @@ An image can be loaded from disk or URL and rendered into the document. Images w
 When setting the size of the image it can be adjusted proportionate by setting just the height or width. If both are set the image will be stretched to fit within that area.
 - Source - The location of the image described as a absolute or relative path (relative to the running application). You can also use a URL to get the image downloaded.
 *There is an issue with loading images from URL. You cannot use the char : in the path. (ie. http://localhost:12345/MyImage.png). Feel free to contribute to fixing this issue. :)*
+- CacheMode - Defines how images downloadeed from the web should be cached. (Preferably, Always, Never)
+-- Preferably - Caches the image if possible.
+-- Always - Caches the image and throws if it cannot be cached.
+-- Never - Always downloads a fresh image.
 
 If you want to provide image data directly using byte[], then you can encode using windows-1252 and provide the image data as a string.
 ```

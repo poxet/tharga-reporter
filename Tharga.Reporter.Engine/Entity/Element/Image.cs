@@ -1,5 +1,4 @@
 using System;
-using System.Data.SqlTypes;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -14,8 +13,17 @@ namespace Tharga.Reporter.Engine.Entity.Element
     public class Image : SinglePageAreaElement
     {
         private string _source;
+        private ECacheMode? _cacheMode;
+
+        public enum ECacheMode
+        {
+            Preferably,
+            Always,
+            Never
+        }
 
         public string Source { get { return _source ?? string.Empty; } set { _source = value; } }
+        public ECacheMode CacheMode { get { return _cacheMode ?? ECacheMode.Preferably; } set { _cacheMode = value; } }
 
         internal override void Render(IRenderData renderData)
         {
@@ -132,9 +140,12 @@ namespace Tharga.Reporter.Engine.Entity.Element
                 Uri path;
                 if (Uri.TryCreate(image, UriKind.Absolute, out path))
                 {
-                    if (WebResourceByCache(image, ref imageData))
+                    if (CacheMode != ECacheMode.Never)
                     {
-                        return true;
+                        if (WebResourceByCache(image, ref imageData))
+                        {
+                            return true;
+                        }
                     }
 
                     if (WebResourceDirectly(image, ref imageData))
@@ -178,7 +189,7 @@ namespace Tharga.Reporter.Engine.Entity.Element
             }
         }
 
-        private static bool WebResourceByCache(string image, ref System.Drawing.Image imageData)
+        private bool WebResourceByCache(string image, ref System.Drawing.Image imageData)
         {
             var localName = image.Substring(image.IndexOf(":", StringComparison.Ordinal) + 3).Replace("/", "_").Replace("?", "_").Replace("=", "_").Replace("&", "_").Replace(":", "_");
             var cacheFileName = string.Format("{0}{1}", Path.GetTempPath(), localName);
@@ -192,12 +203,18 @@ namespace Tharga.Reporter.Engine.Entity.Element
                         client.DownloadFile(image, cacheFileName);
                     }
                 }
-                catch (WebException)
+                catch (WebException exception)
                 {
                     if (File.Exists(cacheFileName))
                     {
                         File.Delete(cacheFileName);
                     }
+
+                    if (CacheMode == ECacheMode.Always)
+                    {
+                        throw new InvalidOperationException("Unable to download image file to file.", exception).AddData("cacheFileName", cacheFileName);
+                    }
+
                     return false;
                 }
             }
@@ -222,6 +239,9 @@ namespace Tharga.Reporter.Engine.Entity.Element
             if (_source != null)
                 xme.SetAttribute("Source", _source);
 
+            if (_cacheMode != null)
+                xme.SetAttribute("CacheMode", _cacheMode.ToString());
+
             return xme;
         }
 
@@ -234,6 +254,9 @@ namespace Tharga.Reporter.Engine.Entity.Element
             var xmlSource = xme.Attributes["Source"];
             if (xmlSource != null)
                 image.Source = xmlSource.Value;
+
+            if (xme.Attributes["CacheMode"] != null)
+                image.CacheMode = (ECacheMode)Enum.Parse(typeof(ECacheMode), xme.Attributes["CacheMode"].Value);
 
             return image;
         }
