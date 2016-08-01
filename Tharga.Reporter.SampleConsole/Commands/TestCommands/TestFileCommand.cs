@@ -17,7 +17,7 @@ namespace Tharga.Reporter.ConsoleSample.Commands.TestCommands
         {
         }
 
-        public override async Task<bool> InvokeAsync(string paramList)
+        public async override Task<bool> InvokeAsync(string paramList)
         {
             var index = 0;
             var templateFile = QueryParam<string>("Template File", GetParam(paramList, index++));

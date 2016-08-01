@@ -19,8 +19,7 @@
   </Target>
 
   <Target Name="UpdateAssemblyVersion" Condition="'$(Version)' != ''">
-    <Message Text="##teamcity[buildNumber '$(MajorVersion).$(MinorVersion).$(Build).$(Version)-alfa']" />
-	<Message Text="##teamcity[version '$(MajorVersion).$(MinorVersion).$(Build).$(Version)']" />
+    <Message Text="##teamcity[buildNumber '$(MajorVersion).$(MinorVersion).$(Build).$(Version)']" />
     <RegexTransform Items="@(RegexTransform)" />
   </Target>
 
