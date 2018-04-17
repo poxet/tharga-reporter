@@ -5,13 +5,12 @@
   <PropertyGroup>
     <MajorVersion>1</MajorVersion>
     <MinorVersion>2</MinorVersion>
-    <Build>0</Build>
   </PropertyGroup>
 
   <ItemGroup>
     <RegexTransform Include="AssemblyVersionInfo.cs">
       <Find>(?&lt;major&gt;\d+)\.(?&lt;minor&gt;\d+)\.(?&lt;build&gt;\d+)\.(?&lt;revision&gt;\d+)</Find>
-      <ReplaceWith>$(MajorVersion).$(MinorVersion).$(Build).$(Version)</ReplaceWith>
+      <ReplaceWith>$(MajorVersion).$(MinorVersion).$(Version)</ReplaceWith>
     </RegexTransform>
   </ItemGroup>
 
@@ -19,7 +18,7 @@
   </Target>
 
   <Target Name="UpdateAssemblyVersion" Condition="'$(Version)' != ''">
-    <Message Text="##teamcity[buildNumber '$(MajorVersion).$(MinorVersion).$(Build).$(Version)']" />
+    <Message Text="##teamcity[buildNumber '$(MajorVersion).$(MinorVersion).$(Version)']" />
     <RegexTransform Items="@(RegexTransform)" />
   </Target>
 
