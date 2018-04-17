@@ -71,7 +71,7 @@ namespace Tharga.Reporter.Tests.Rendering
             //Arrange
             var image = new Image
             {
-                Source = @"C:\Dev\tharga-reporter\Tharga.Reporter.Tests\Resources\thargelion-logo.png",
+                Source = @"Resources\thargelion-logo.png",
                 CacheMode = cacheMode,
                 IsBackground = isBackground
             };
