@@ -23,3 +23,4 @@ using System.Runtime.InteropServices;
 [assembly: Guid("d56c2145-fb11-418f-871a-85481f26f7d3")]
 
 [assembly: InternalsVisibleTo("Tharga.Reporter.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

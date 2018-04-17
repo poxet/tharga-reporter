@@ -12,7 +12,6 @@ namespace Tharga.Reporter.Tests.Rendering
     public class Rendering_Text
     {
         [Test]
-        [Ignore("Can't gain access to internal stuff.")]
         public void When_rendering_text()
         {
             //Arrange
@@ -33,6 +32,7 @@ namespace Tharga.Reporter.Tests.Rendering
             renderDataMock.Setup(x => x.IncludeBackground).Returns(false);
             renderDataMock.Setup(x => x.ElementBounds).Returns(new XRect());
             renderDataMock.Setup(x => x.DebugData).Returns((IDebugData)null);
+            renderDataMock.Setup(x => x.DocumentProperties).Returns(Mock.Of<DocumentProperties>());
 
             //Act
             text.Render(renderDataMock.Object);

@@ -1,6 +1,5 @@
 using PdfSharp.Drawing;
 using Tharga.Reporter.Engine.Entity;
-using Tharga.Reporter.Engine.Entity.Area;
 using Tharga.Reporter.Engine.Entity.Util;
 
 namespace Tharga.Reporter.Engine.Interface

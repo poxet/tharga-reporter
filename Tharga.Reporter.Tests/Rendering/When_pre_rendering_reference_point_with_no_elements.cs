@@ -9,7 +9,6 @@ using Tharga.Reporter.Engine.Interface;
 namespace Tharga.Reporter.Tests.Rendering
 {
     [TestFixture]
-    [Ignore("Can't gain access to internal stuff.")]
     public class When_pre_rendering_reference_point_with_no_elements : AaaTest
     {
         private ReferencePoint _referencePoint;
@@ -36,6 +35,7 @@ namespace Tharga.Reporter.Tests.Rendering
             _renderDataMock.Setup(x => x.IncludeBackground).Returns(false);
             _renderDataMock.Setup(x => x.ElementBounds).Returns(It.IsAny<XRect>());
             _renderDataMock.SetupSet(x => x.ElementBounds = It.IsAny<XRect>());
+            _renderDataMock.SetupGet(x => x.DocumentProperties).Returns(Mock.Of<DocumentProperties>());
         }
 
         protected override void Act()
@@ -44,8 +44,7 @@ namespace Tharga.Reporter.Tests.Rendering
         }
 
         [Test]
-        [Ignore("Can't gain access to internal stuff.")]
-        public void Then_nothing_is_drawn()
+        public void Then_nothing_is_rendered()
         {
             _graphicsMock.Verify(x => x.DrawLine(It.IsAny<XPen>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<double>()), Times.Never);
             _graphicsMock.Verify(x => x.DrawEllipse(It.IsAny<XPen>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);

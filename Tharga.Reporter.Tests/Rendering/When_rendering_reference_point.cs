@@ -9,7 +9,6 @@ using Tharga.Reporter.Engine.Interface;
 namespace Tharga.Reporter.Tests.Rendering
 {
     [TestFixture]
-    [Ignore("Can't gain access to internal stuff.")]
     public class When_rendering_reference_point : AaaTest
     {
         private ReferencePoint _referencePoint;
@@ -41,6 +40,7 @@ namespace Tharga.Reporter.Tests.Rendering
             _renderDataMock.Setup(x => x.IncludeBackground).Returns(false);
             _renderDataMock.Setup(x => x.ElementBounds).Returns(new XRect { Width = 200, Height = 200 });
             _renderDataMock.SetupSet(x => x.ElementBounds = It.IsAny<XRect>());
+            _renderDataMock.SetupGet(x => x.DocumentProperties).Returns(Mock.Of<DocumentProperties>());
 
             _referencePoint.PreRender(_renderDataMock.Object);
         }
@@ -51,21 +51,18 @@ namespace Tharga.Reporter.Tests.Rendering
         }
 
         [Test]
-        [Ignore("Can't gain access to internal stuff.")]
         public void Then_line_is_drawn()
         {
             _graphicsMock.Verify(x => x.DrawLine(It.IsAny<XPen>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<double>()), Times.Once);
         }
 
         [Test]
-        [Ignore("Can't gain access to internal stuff.")]
         public void Then_string_is_drawn()
         {
             _graphicsMock.Verify(x => x.DrawString(It.IsAny<string>(), It.IsAny<XFont>(), It.IsAny<XBrush>(), It.IsAny<XPoint>(), It.IsAny<XStringFormat>()), Times.Once);
         }
 
         [Test]
-        [Ignore("Can't gain access to internal stuff.")]
         public void Then_nothing_else_is_drawn()
         {
             _graphicsMock.Verify(x => x.DrawEllipse(It.IsAny<XPen>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);

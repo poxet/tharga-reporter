@@ -82,5 +82,7 @@ _ReSharper.*
 *.vsp
 *.psess
 
+.vs/*
+
 StyleCop.Cache
 *.orig

@@ -17,9 +17,9 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
         public enum ECacheMode
         {
-            Preferably,
-            Always,
-            Never
+            Preferably, //Download file and store locally if possible. Read file from cache if possible.
+            Always, //Always download files locally. Read file from cache if possible.
+            Never //Never download files locally. Never read from cache.
         }
 
         public string Source { get { return _source ?? string.Empty; } set { _source = value; } }
@@ -30,18 +30,33 @@ namespace Tharga.Reporter.Engine.Entity.Element
             if (IsNotVisible(renderData)) return;
 
             var bounds = GetBounds(renderData.ParentBounds);
-            var imageData = GetImage(renderData.DocumentData, bounds);
-            renderData.ElementBounds = GetImageBounds(imageData, bounds);
 
-            if (renderData.IncludeBackground || !IsBackground)
+            System.Drawing.Image imageData = null;
+            try
             {
-                using (var image = XImage.FromGdiPlusImage(imageData))
+                imageData = GetImage(renderData.DocumentData, bounds);
+                renderData.ElementBounds = GetImageBounds(imageData, bounds);
+
+                if (renderData.IncludeBackground || !IsBackground)
                 {
-                    renderData.Graphics.DrawImage(image, renderData.ElementBounds);
+                    using (var image = XImage.FromGdiPlusImage(imageData))
+                    {
+                        renderData.Graphics.DrawImage(image, renderData.ElementBounds);
+                    }
                 }
             }
-
-            imageData.Dispose();
+            catch (Exception e)
+            {
+                var f = new Font();
+                var font = new XFont(f.GetName(renderData.Section), f.GetSize(renderData.Section), f.GetStyle(renderData.Section));
+                var brush = new XSolidBrush(XColor.FromArgb(f.GetColor(renderData.Section)));
+                renderData.Graphics.DrawRectangle(new XPen(f.GetColor(renderData.Section)), brush, bounds);
+                renderData.Graphics.DrawString(e.Message, font, brush, new XPoint(bounds.Left, bounds.Top), XStringFormats.TopLeft);
+            }
+            finally
+            {
+                imageData?.Dispose();
+            }
         }
 
         private static XRect GetImageBounds(System.Drawing.Image imageData, XRect bounds)
@@ -107,17 +122,22 @@ namespace Tharga.Reporter.Engine.Entity.Element
 
                 if (imageData == null)
                 {
-                    imageData = new Bitmap((int)bounds.Width, (int)bounds.Height);
-                    using (var gfx = Graphics.FromImage(imageData))
-                    {
-                        var pen = new Pen(Color.Red);
-                        gfx.DrawLine(pen, 0, 0, imageData.Width, imageData.Height);
-                        gfx.DrawLine(pen, imageData.Width, 0, 0, imageData.Height);
-                        var font = new System.Drawing.Font("Verdana", 10);
-                        var brush = new SolidBrush(Color.DarkRed);
-                        gfx.DrawString(string.Format("Image '{0}' is missing.", source), font, brush, 0, 0);
-                    }
+                    throw new InvalidOperationException($"Cannot generate image data for source '{source}'.");
                 }
+
+                //if (imageData == null)
+                //{
+                //    imageData = new Bitmap((int)bounds.Width, (int)bounds.Height);
+                //    using (var gfx = Graphics.FromImage(imageData))
+                //    {
+                //        var pen = new Pen(Color.Red);
+                //        gfx.DrawLine(pen, 0, 0, imageData.Width, imageData.Height);
+                //        gfx.DrawLine(pen, imageData.Width, 0, 0, imageData.Height);
+                //        var font = new System.Drawing.Font("Verdana", 10);
+                //        var brush = new SolidBrush(Color.DarkRed);
+                //        gfx.DrawString(string.Format("Image '{0}' is missing.", source), font, brush, 0, 0);
+                //    }
+                //}
 
                 return imageData;
             }
