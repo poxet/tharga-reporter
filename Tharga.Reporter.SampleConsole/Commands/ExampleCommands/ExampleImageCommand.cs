@@ -24,7 +24,7 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
             var section = new Section();
             section.Pane.ElementList.Add(new Rectangle { BorderColor = Color.Black, Left = "1cm", Top = "1cm", Bottom = "1cm", Right = "1cm" });
             section.Pane.ElementList.Add(new Line { Top = "0", Left = "0", Bottom = "0", Right = "0" });
-            section.Pane.ElementList.Add(new Image { Source = "{Img1}", Height = "150", Top = "50", Left="50" });
+            section.Pane.ElementList.Add(new Image { Source = "{Img1}", Height = "150", Top = "50", Left="50", Width = "250"});
             section.Pane.ElementList.Add(new Image { Source = "{Img2}", Height = "150", Top = "200", Left = "50" });
             var template = new Template(section);
 
@@ -34,7 +34,7 @@ namespace Tharga.Reporter.ConsoleSample.Commands.ExampleCommands
 
             //Image from url
             var sampleData = new DocumentData();
-            sampleData.Add("Img1", "http://www.thargelion.se/Images/Logotype/Thargelion-White-Icon-150.png");
+            sampleData.Add("Img1", "http://www.thargelion.se/Images/Logotype/Thargelion-White-Icon-150.pngx");
 
             //Image from byte[]. Convert to string with Encoding Windows-1252
             var imageAsbyteArrayData = GetImageAsbyteArrayData();

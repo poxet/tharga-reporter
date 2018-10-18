@@ -48,15 +48,53 @@ namespace Tharga.Reporter.Engine.Entity.Element
             catch (Exception e)
             {
                 var f = new Font();
-                var font = new XFont(f.GetName(renderData.Section), f.GetSize(renderData.Section), f.GetStyle(renderData.Section));
-                var brush = new XSolidBrush(XColor.FromArgb(f.GetColor(renderData.Section)));
+                var font = new XFont(f.GetName(renderData.Section), f.GetSize(renderData.Section) / 1.5, f.GetStyle(renderData.Section));
+                var brush = new XSolidBrush(XColor.FromKnownColor(KnownColor.Transparent));
                 renderData.Graphics.DrawRectangle(new XPen(f.GetColor(renderData.Section)), brush, bounds);
-                renderData.Graphics.DrawString(e.Message, font, brush, new XPoint(bounds.Left, bounds.Top), XStringFormats.TopLeft);
+                var textBrush = new XSolidBrush(XColor.FromArgb(f.GetColor(renderData.Section)));
+
+                try
+                {
+                    var nextTop = OutputText(renderData, e.Message, font, textBrush, new XPoint(bounds.Left, bounds.Top), bounds.Width);
+                    if (e.Data.Contains("source"))
+                        OutputText(renderData, e.Data["source"].ToString(), font, textBrush, new XPoint(bounds.Left, bounds.Top + nextTop), bounds.Width);
+                }
+                catch (Exception exception)
+                {
+                    renderData.Graphics.DrawString(exception.Message, font, brush, new XPoint(bounds.Left, bounds.Top), XStringFormats.TopLeft);
+                }
             }
             finally
             {
                 imageData?.Dispose();
             }
+        }
+
+        private static double OutputText(IRenderData renderData, string message, XFont font, XSolidBrush brush, XPoint point, double width)
+        {
+            var textSize = renderData.Graphics.MeasureString(message, font);
+            var lineCount = 0;
+
+            var offset = 0;
+            var part = 0;
+            var more = true;
+            while (more) //offset + part < message.Length)
+            {
+                more = false;
+                part = message.Length - offset;
+                while (renderData.Graphics.MeasureString(message.Substring(offset, part), font).Width > width)
+                {
+                    part--;
+                    more = true;
+                }
+                renderData.Graphics.DrawString(message.Substring(offset, part), font, brush, new XPoint(point.X,point.Y+ textSize.Height * lineCount), XStringFormats.TopLeft);
+
+                offset = part;
+                lineCount++;
+            }
+
+
+            return textSize.Height * lineCount;
         }
 
         private static XRect GetImageBounds(System.Drawing.Image imageData, XRect bounds)
